@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import "package:jellytics/views/bottom_nav/bottom_nav.dart" as bottom_nav;
+import 'package:jellytics/views/bottom_nav/bottom_nav.dart' as bottom_nav;
 
 class App extends StatelessWidget {
   const App({super.key});

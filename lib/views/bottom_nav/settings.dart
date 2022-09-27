@@ -10,32 +10,21 @@ class _SettingsWidget extends StatefulWidget {
 }
 
 class _SettingsState extends State<_SettingsWidget> {
-  String username = "";
-  String password = "";
-  String serverURL = "";
-  String loginData = "";
-  final TextEditingController usernameTextController = TextEditingController();
+  String _username = "";
+  String _password = "";
+  String _serverURL = "";
+  final SecureStorage _storage = SecureStorage();
 
   void getLoginData() async {
-    if (username != "" && password != "" && serverURL != "") {
+    if (_username != "" && _password != "" && _serverURL != "") {
       LoginObject login = LoginObject(
-          username: username, password: password, serverURL: serverURL);
+          username: _username, password: _password, serverURL: _serverURL);
 
       await login.getMediaToken();
 
-      // Update class variable loginData, use setState so Flutter knows a value changed
-      // Flutter will redraw screen as a result
-      setState(() {
-        loginData = login.mediaBrowser.token;
-      });
-
-      print("Starting write...");
-      await writeData();
-      print("Wrote data!");
-      await readData();
-      print("Read data!");
-    } else {
-      print("all values empty");
+      // Add the token to secure storage to be able to read from it later
+      _storage.addItem(key: loginKeys.token, value: login.mediaBrowser.token);
+      _storage.addItem(key: loginKeys.serverURL, value: _serverURL);
     }
   }
 
@@ -47,7 +36,7 @@ class _SettingsState extends State<_SettingsWidget> {
           initialValue: "joshl",
           onChanged: (input) {
             setState(() {
-              username = input;
+              _username = input;
             });
           },
           decoration: const InputDecoration(
@@ -59,7 +48,7 @@ class _SettingsState extends State<_SettingsWidget> {
           initialValue: "cheap-wrist-refined-BUILT-rafter-nutria-tedious-molar",
           onChanged: (input) {
             setState(() {
-              password = input;
+              _password = input;
             });
           },
           decoration: const InputDecoration(
@@ -71,7 +60,7 @@ class _SettingsState extends State<_SettingsWidget> {
           initialValue: "http://192.168.50.61:8096",
           onChanged: (input) {
             setState(() {
-              serverURL = input;
+              _serverURL = input;
             });
           },
           decoration: const InputDecoration(

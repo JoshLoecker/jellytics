@@ -5,6 +5,6 @@
 
 library bottom_nav;
 
-export "package:jellytics/views/bottom_nav/activity.dart";
-export "package:jellytics/views/bottom_nav/library.dart";
-export "package:jellytics/views/bottom_nav/settings.dart";
+export 'package:jellytics/views/bottom_nav/activity.dart';
+export 'package:jellytics/views/bottom_nav/library.dart';
+export 'package:jellytics/views/bottom_nav/settings.dart';

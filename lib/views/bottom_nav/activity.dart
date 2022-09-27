@@ -1,6 +1,5 @@
-import "dart:math";
-
 import 'package:flutter/material.dart';
+import 'package:jellytics/utils/secure_storage.dart';
 
 class _ActivityWidget extends StatefulWidget {
   const _ActivityWidget();
@@ -10,6 +9,19 @@ class _ActivityWidget extends StatefulWidget {
 }
 
 class _ActivityState extends State<_ActivityWidget> {
+  void isLoginAvailable() async {
+    /*
+    This function tests if the secure storage data contains our username/token/serverURL information
+    */
+    SecureStorage storage = SecureStorage();
+    if (await storage.isLoginSetup()) {
+      print("URL: ${await storage.getItem(key: loginKeys.serverURL)}");
+      print("Token: ${await storage.getItem(key: loginKeys.token)}");
+    } else {
+      print("Storage not ready");
+    }
+  }
+
   Widget activityCard(
       {required String label,
       double maxHeight = 125,
@@ -74,19 +86,6 @@ class _ActivityState extends State<_ActivityWidget> {
     );
   }
 
-  MaterialColor randomColor() {
-    // Choose a random primary color; from: https://stackoverflow.com/a/57034842
-    return Colors.primaries[Random().nextInt(Colors.primaries.length)];
-  }
-
-  String randomString({int len = 200}) {
-    // Create a random string; from: https://stackoverflow.com/a/61929967
-    var r = Random();
-    String randomString =
-        String.fromCharCodes(List.generate(len, (index) => r.nextInt(33) + 89));
-    return randomString;
-  }
-
   Widget infiniteListView({int itemCount = 10}) {
     return Scrollbar(
       child: NotificationListener<ScrollNotification>(
@@ -94,7 +93,7 @@ class _ActivityState extends State<_ActivityWidget> {
           itemCount: itemCount,
           itemBuilder: (context, index) {
             return activityCard(
-              label: randomString(),
+              label: "",
               containerColor: Colors.grey,
             );
           }, // itemBuilder
@@ -109,6 +108,7 @@ class _ActivityState extends State<_ActivityWidget> {
 
   @override
   Widget build(BuildContext context) {
+    isLoginAvailable();
     return infiniteListView();
   }
 }
