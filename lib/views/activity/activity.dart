@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:jellytics/utils/extensions.dart';
 import 'package:jellytics/utils/secure_storage.dart';
+import 'package:jellytics/views/activity/parse_streams.dart';
 
 class _ActivityWidget extends StatefulWidget {
   const _ActivityWidget();
@@ -14,18 +16,21 @@ class _ActivityState extends State<_ActivityWidget> {
     This function tests if the secure storage data contains our username/token/serverURL information
     */
     SecureStorage storage = SecureStorage();
-    if (await storage.isLoginSetup()) {
-      print("URL: ${await storage.getItem(key: loginKeys.serverURL)}");
-      print("Token: ${await storage.getItem(key: loginKeys.token)}");
-    } else {
-      print("Storage not ready");
-    }
+    await storage.isLoginSetup();
   }
 
   Widget activityCard(
-      {required String label,
+      {required String? titleName,
+      required int? seasonNumber,
+      required int? episodeNumber,
+      required String? episodeTitle,
+      required int currentSeconds,
+      required int currentMinutes,
+      required int totalSeconds,
+      required int totalMinutes,
+      required String? userPlaying,
       double maxHeight = 125,
-      MaterialColor? containerColor}) {
+      MaterialColor containerColor = Colors.grey}) {
     // Get the width of the safe area and subtract the left/right padding from it
     // The resulting value is the maximum safe width we can make our widgets
     double screenWidth = MediaQuery.of(context).size.width;
@@ -63,19 +68,23 @@ class _ActivityState extends State<_ActivityWidget> {
                   // Place contents at top-right corner, with small padding amount (padding defined above)
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: const <Widget>[
-                    Text("Series Name"),
-                    Text("S01 - E10 - Episode Title"),
-                    Text("min:sec of min:sec"),
-                    Text("User"),
+                  children: <Widget>[
+                    Text(titleName!),
+                    Text(
+                        // Set up S01 - E05 - EPISODE TITLE
+                        "S$seasonNumber - E$episodeNumber - $episodeTitle"),
+                    Text(
+                      // 10:45 of 23:15
+                      "$currentMinutes:${currentSeconds.leadingZero()} of $totalMinutes:${totalSeconds.leadingZero()}",
+                    ),
+                    Text(userPlaying!),
                   ],
                 ),
               ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment:
-                  MainAxisAlignment.end, // place at bottom of card
+              mainAxisAlignment: MainAxisAlignment.end, // place at bottom of card
               children: const <Widget>[
                 Icon(Icons.play_circle),
               ],
@@ -86,6 +95,34 @@ class _ActivityState extends State<_ActivityWidget> {
     );
   }
 
+  Widget activityListView() {
+    return FutureBuilder(
+      future: startParse(),
+      builder: (context, AsyncSnapshot<List<StreamsData>> streams) {
+        if (streams.hasData) {
+          //print(streams.data?[0].titleName);
+          return ListView.builder(
+              itemCount: streams.data?.length,
+              itemBuilder: (context, index) {
+                return activityCard(
+                  titleName: streams.data?[index].masterName,
+                  seasonNumber: streams.data?[index].seasonNum,
+                  episodeNumber: streams.data?[index].episodeNum,
+                  episodeTitle: streams.data?[index].episodeTitle,
+                  currentSeconds: 4,
+                  currentMinutes: 2,
+                  totalSeconds: 9,
+                  totalMinutes: 10,
+                  userPlaying: streams.data?[index].userName,
+                );
+              });
+        } else {
+          return const CircularProgressIndicator();
+        }
+      },
+    );
+  }
+
   Widget infiniteListView({int itemCount = 10}) {
     return Scrollbar(
       child: NotificationListener<ScrollNotification>(
@@ -93,8 +130,15 @@ class _ActivityState extends State<_ActivityWidget> {
           itemCount: itemCount,
           itemBuilder: (context, index) {
             return activityCard(
-              label: "",
-              containerColor: Colors.grey,
+              titleName: "Friends",
+              seasonNumber: 1,
+              episodeNumber: 10,
+              episodeTitle: "My Episode Title",
+              currentSeconds: 09,
+              currentMinutes: 2,
+              totalSeconds: 4,
+              totalMinutes: 09,
+              userPlaying: "joshl",
             );
           }, // itemBuilder
         ),
@@ -109,7 +153,8 @@ class _ActivityState extends State<_ActivityWidget> {
   @override
   Widget build(BuildContext context) {
     isLoginAvailable();
-    return infiniteListView();
+    // return infiniteListView();
+    return activityListView();
   }
 }
 

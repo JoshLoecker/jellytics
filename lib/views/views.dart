@@ -3,8 +3,8 @@
 // Export the following files so only `import "/path/to/bottom_nav.dart"` is required
 // From: https://stackoverflow.com/questions/25860342
 
-library bottom_nav;
+library views;
 
-export 'package:jellytics/views/bottom_nav/activity.dart';
-export 'package:jellytics/views/bottom_nav/library.dart';
-export 'package:jellytics/views/bottom_nav/settings.dart';
+export 'package:jellytics/views/activity/activity.dart';
+export 'package:jellytics/views/library.dart';
+export 'package:jellytics/views/settings.dart';

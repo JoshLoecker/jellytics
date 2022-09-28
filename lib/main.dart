@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:jellytics/views/bottom_nav/bottom_nav.dart' as bottom_nav;
+import 'package:jellytics/views/views.dart' as views;
 
 class App extends StatelessWidget {
   const App({super.key});
-
-  static const String _title = "My App Title";
 
   @override
   Widget build(BuildContext context) {
     FlutterNativeSplash.remove(); // App is built, OK to remove splash screen
     return const MaterialApp(
-      title: _title,
+      title: "Jellytics",
       home: StatefulApp(),
     );
   }
@@ -26,7 +24,7 @@ class StatefulApp extends StatefulWidget {
 
 class _StatefulApp extends State<StatefulApp> {
   int _currentNavIndex = 0;
-  String _appBarTitle = "Jellytics";
+  final String _appBarTitle = "Jellytics";
 
   @override
   Widget build(BuildContext context) {
@@ -62,9 +60,9 @@ class _StatefulApp extends State<StatefulApp> {
   // This is a list of items that are being provided as the "content" widgets.
   // Modifying content of these files will impact the view on the appropriate screen widget
   static const List<Widget> _screenWidgets = <Widget>[
-    bottom_nav.activityContent,
-    bottom_nav.libraryContent,
-    bottom_nav.settingsContent,
+    views.activityContent,
+    views.libraryContent,
+    views.settingsContent,
   ];
 
   // When tapping on the BottomNavBar, switch to the appropriate index

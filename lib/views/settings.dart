@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:jellytics/api/end_points.dart';
+import 'package:jellytics/api/authentication.dart';
+import 'package:jellytics/api/paths.dart';
 import 'package:jellytics/utils/secure_storage.dart';
 
 class _SettingsWidget extends StatefulWidget {
@@ -14,18 +15,49 @@ class _SettingsState extends State<_SettingsWidget> {
   String _password = "";
   String _serverURL = "";
   final SecureStorage _storage = SecureStorage();
+  String _loginError = "";
 
   void getLoginData() async {
     if (_username != "" && _password != "" && _serverURL != "") {
-      LoginObject login = LoginObject(
-          username: _username, password: _password, serverURL: _serverURL);
+      await LoginObject.construct(
+        username: _username,
+        password: _password,
+        serverURL: _serverURL,
+      );
 
-      await login.getMediaToken();
+      // Validate user is logged in
+      final String message;
+      GETSystem systemData = GETSystem();
+      if (!await systemData.isLoggedIn()) {
+        message = "Error logging in! "
+            "Check that your 'Server URL' starts with "
+            "'http://' or 'https://', "
+            "and ends in a port number (default http Jellyfin port is 8096).";
+      } else {
+        message = "Successfully logged in!";
+      }
+      setState(() {
+        _loginError = message;
+      });
 
       // Add the token to secure storage to be able to read from it later
-      _storage.addItem(key: loginKeys.token, value: login.mediaBrowser.token);
-      _storage.addItem(key: loginKeys.serverURL, value: _serverURL);
+      _storage.addItem(key: LoginKeys.serverURL, value: _serverURL);
+      //_storage.addItem(key: LoginKeys.mediaBrowser, value: login.mediaBrowser);
+      //_storage.addItem(key: LoginKeys.mediaToken, value: login.mediaToken);
+      //_storage.addItem(key: LoginKeys.userID, value: login.userID);
     }
+  }
+
+  void clearStorageData() async {
+    await _storage.clear();
+  }
+
+  void printStorageItems() async {
+    await _storage.printStorageItems();
+  }
+
+  Future<String> setInitialValue(LoginKeys key) async {
+    return await _storage.getItem(key: key);
   }
 
   @override
@@ -70,6 +102,17 @@ class _SettingsState extends State<_SettingsWidget> {
         ElevatedButton(
           onPressed: getLoginData,
           child: const Text("Log in"),
+        ),
+        ElevatedButton(
+          onPressed: clearStorageData,
+          child: const Text("Clear SecureStorage"),
+        ),
+        ElevatedButton(
+            onPressed: printStorageItems,
+            child: const Text("Print Storage Items")),
+        Text(
+          _loginError,
+          softWrap: true,
         ),
       ],
     );
