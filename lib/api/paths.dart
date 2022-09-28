@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:jellytics/api/async_requests.dart';
 import 'package:jellytics/api/print.dart';
 import 'package:jellytics/utils/secure_storage.dart';
+import 'package:jellytics/views/library/query.dart';
 
 enum RequestType {
   get,
@@ -111,5 +112,60 @@ class GETImage {
     await storage.isLoginSetup();
 
     return "${await storage.getServerURL()}/Items/$id/Images/Primary";
+  }
+}
+
+class GETLibrary {
+  final SecureStorage _storage = SecureStorage();
+  Response? _response;
+
+  Future<void> getLibraries() async {
+    CreateRequest request = await CreateRequest.construct();
+    final GET getItems = GET("/Items");
+
+    _response = await request.get(getItems, queryParameters: {
+      "userId": await _storage.getUserID(),
+    });
+    prettyPrintJSON(_response?.data);
+  }
+
+  Future<void> getItems({
+    required List<BaseItemKind> includeKind,
+    required List<Field> fields,
+    List<BaseItemKind> excludeKind = const <BaseItemKind>[],
+    int limit = 1,
+  }) async {
+    CreateRequest request = await CreateRequest.construct();
+
+    // Construct the query parameters
+    String fieldString = "";
+    String includeKindString = "";
+    String excludeKindString = "";
+    for (Field element in fields) {
+      fieldString += "${element.name},";
+    }
+    for (BaseItemKind element in includeKind) {
+      includeKindString += "${element.name},";
+    }
+    for (BaseItemKind element in excludeKind) {
+      excludeKindString += "${element.name},";
+    }
+
+    final GET items = GET(
+      "/Users/${await _storage.getUserID()}/Items?IncludeItemTypes=$includeKindString&$excludeKindString&Recursive=True&startIndex=0&limit=$limit&Fields=$fieldString",
+    );
+    Response response = await request.get(items);
+    prettyPrintJSON(response.data);
+  }
+
+  Future<void> getUserMovies() async {
+    CreateRequest request = await CreateRequest.construct();
+    final GET userMovies = GET(
+      "/Users/${await _storage.getUserID()}/Items?IncludeItemTypes=movie&Recursive=True&startIndex=0&limit=1&Fields=MediaStreams,Path",
+    );
+
+    // Response realResponse = await request.get(userMovies);
+    _response = await request.get(userMovies);
+    prettyPrintJSON(await _response?.data);
   }
 }

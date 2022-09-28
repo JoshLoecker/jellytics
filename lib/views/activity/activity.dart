@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jellytics/utils/secure_storage.dart';
-import 'package:jellytics/views/activity/parse_streams.dart';
+import 'package:jellytics/views/activity/get_activity.dart';
 
 class _ActivityWidget extends StatefulWidget {
   const _ActivityWidget();
@@ -30,9 +30,9 @@ class _ActivityState extends State<_ActivityWidget> {
 
     // This is the 2nd line, right below the Movie/Series title
     String detailLine = "";
-    if (streamData.mediaType == MediaType.movie) {
+    if (streamData.mediaType == MediaFormat.movie) {
       detailLine = streamData.releaseYear.toString();
-    } else if (streamData.mediaType == MediaType.episode) {
+    } else if (streamData.mediaType == MediaFormat.episode) {
       detailLine =
           "S${streamData.seasonNum} E${streamData.episodeNum} - ${streamData.episodeTitle}";
     }
@@ -89,7 +89,7 @@ class _ActivityState extends State<_ActivityWidget> {
 
   Widget activityListView() {
     return FutureBuilder(
-      future: startParse(),
+      future: getActivity(),
       builder: (context, AsyncSnapshot<List<StreamsData>> streams) {
         if (streams.hasData) {
           if (streams.data?.isEmpty == true) {

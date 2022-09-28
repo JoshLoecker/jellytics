@@ -8,9 +8,13 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FlutterNativeSplash.remove(); // App is built, OK to remove splash screen
-    return const MaterialApp(
+    return MaterialApp(
       title: "Jellytics",
-      home: StatefulApp(),
+      theme: ThemeData(brightness: Brightness.light), // light mode
+      darkTheme: ThemeData(brightness: Brightness.dark), // dark mode
+      themeMode: ThemeMode.system, // follow system theme
+      debugShowCheckedModeBanner: false,
+      home: const StatefulApp(),
     );
   }
 }
@@ -36,6 +40,7 @@ class _StatefulApp extends State<StatefulApp> {
         child: _screenWidgets.elementAt(_currentNavIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        elevation: 0, // no drop shadow
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.tv_sharp),

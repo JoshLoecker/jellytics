@@ -1,7 +1,7 @@
 import 'package:jellytics/api/paths.dart';
 import 'package:jellytics/api/print.dart';
 
-enum MediaType { movie, episode, unknown }
+enum MediaFormat { movie, episode, unknown }
 
 class StreamsData {
   late final String masterName;
@@ -10,14 +10,14 @@ class StreamsData {
   late final int episodeNum;
   late final String episodeTitle;
   late final int releaseYear;
-  late final MediaType mediaType;
+  late final MediaFormat mediaType;
   late final String remoteURL;
   late final String mediaID;
   late final String userName;
   late final String imagePath;
 }
 
-Future<List<StreamsData>> startParse() async {
+Future<List<StreamsData>> getActivity() async {
   /// This function will build a list of StreamsData instances
   ///
   /// It will be used to display data on the "Activity" Page
@@ -35,7 +35,7 @@ Future<List<StreamsData>> startParse() async {
       data.episodeTitle = await currentStream["NowPlayingItem"]["Name"];
       data.releaseYear = await currentStream["NowPlayingItem"]["ProductionYear"];
       data.remoteURL = await currentStream["RemoteEndPoint"];
-      data.mediaType = getMediaType(currentStream);
+      data.mediaType = getMediaFormat(currentStream);
       data.userName = await currentStream["UserName"];
       data.seasonNum = await getSeasonNum(currentStream); // -1 if not a series
       data.episodeNum = await getEpisodeNum(currentStream); // -1 if not a series
@@ -49,9 +49,9 @@ Future<List<StreamsData>> startParse() async {
       }
 
       // Get the seasonId if series, otherwise get Id for movies
-      if (data.mediaType == MediaType.episode) {
+      if (data.mediaType == MediaFormat.episode) {
         data.mediaID = await currentStream["NowPlayingItem"]["SeriesId"];
-      } else if (data.mediaType == MediaType.movie) {
+      } else if (data.mediaType == MediaFormat.movie) {
         data.mediaID = await currentStream["NowPlayingItem"]["Id"];
       }
 
@@ -95,21 +95,21 @@ Future<int> getEpisodeNum(Map<String, dynamic> stream) async {
   }
 }
 
-MediaType getMediaType(Map<String, dynamic> stream) {
+MediaFormat getMediaFormat(Map<String, dynamic> stream) {
   /// This function matches the current media type string with a value in MediaType
   ///
   /// If no MediaType is found, MediaType.unknown is returned
-  for (int i = 0; i < MediaType.values.length; i++) {
+  for (int i = 0; i < MediaFormat.values.length; i++) {
     // Define current MeidaType tag and the current stream's tag
-    String currentMediaTag = MediaType.values[i].name.toLowerCase();
+    String currentMediaTag = MediaFormat.values[i].name.toLowerCase();
     String currentStreamTag = stream["NowPlayingItem"]["Type"].toString().toLowerCase();
 
     // If the tags match, return the current tag
     if (currentMediaTag == currentStreamTag) {
-      return MediaType.values[i];
+      return MediaFormat.values[i];
     }
   }
 
   // No tag was found, return unknown
-  return MediaType.unknown;
+  return MediaFormat.unknown;
 }

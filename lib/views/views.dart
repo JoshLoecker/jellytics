@@ -6,5 +6,5 @@
 library views;
 
 export 'package:jellytics/views/activity/activity.dart';
-export 'package:jellytics/views/library.dart';
+export 'package:jellytics/views/library/library.dart';
 export 'package:jellytics/views/settings.dart';
