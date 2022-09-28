@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jellytics/utils/extensions.dart';
 import 'package:jellytics/utils/secure_storage.dart';
 import 'package:jellytics/views/activity/parse_streams.dart';
 
@@ -20,15 +19,7 @@ class _ActivityState extends State<_ActivityWidget> {
   }
 
   Widget activityCard(
-      {required String? titleName,
-      required int? seasonNumber,
-      required int? episodeNumber,
-      required String? episodeTitle,
-      required int currentSeconds,
-      required int currentMinutes,
-      required int totalSeconds,
-      required int totalMinutes,
-      required String? userPlaying,
+      {required StreamsData streamData,
       double maxHeight = 125,
       MaterialColor containerColor = Colors.grey}) {
     // Get the width of the safe area and subtract the left/right padding from it
@@ -36,6 +27,15 @@ class _ActivityState extends State<_ActivityWidget> {
     double screenWidth = MediaQuery.of(context).size.width;
     double paddingWidth = MediaQuery.of(context).padding.right * 2;
     double maxSafeWidth = screenWidth - paddingWidth;
+
+    // This is the 2nd line, right below the Movie/Series title
+    String detailLine = "";
+    if (streamData.mediaType == MediaType.movie) {
+      detailLine = streamData.releaseYear.toString();
+    } else if (streamData.mediaType == MediaType.episode) {
+      detailLine =
+          "S${streamData.seasonNum} E${streamData.episodeNum} - ${streamData.episodeTitle}";
+    }
 
     return ConstrainedBox(
       constraints: BoxConstraints.expand(
@@ -57,9 +57,7 @@ class _ActivityState extends State<_ActivityWidget> {
           children: <Widget>[
             Container(
               alignment: Alignment.center,
-              child: const Image(
-                image: AssetImage("assets/f_splash_crop.png"),
-              ),
+              child: Image.network(streamData.imagePath),
             ),
             Expanded(
               child: Padding(
@@ -69,15 +67,9 @@ class _ActivityState extends State<_ActivityWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    Text(titleName!),
-                    Text(
-                        // Set up S01 - E05 - EPISODE TITLE
-                        "S$seasonNumber - E$episodeNumber - $episodeTitle"),
-                    Text(
-                      // 10:45 of 23:15
-                      "$currentMinutes:${currentSeconds.leadingZero()} of $totalMinutes:${totalSeconds.leadingZero()}",
-                    ),
-                    Text(userPlaying!),
+                    Text(streamData.masterName),
+                    Text(detailLine),
+                    Text(streamData.userName),
                   ],
                 ),
               ),
@@ -100,22 +92,19 @@ class _ActivityState extends State<_ActivityWidget> {
       future: startParse(),
       builder: (context, AsyncSnapshot<List<StreamsData>> streams) {
         if (streams.hasData) {
-          //print(streams.data?[0].titleName);
-          return ListView.builder(
-              itemCount: streams.data?.length,
-              itemBuilder: (context, index) {
-                return activityCard(
-                  titleName: streams.data?[index].masterName,
-                  seasonNumber: streams.data?[index].seasonNum,
-                  episodeNumber: streams.data?[index].episodeNum,
-                  episodeTitle: streams.data?[index].episodeTitle,
-                  currentSeconds: 4,
-                  currentMinutes: 2,
-                  totalSeconds: 9,
-                  totalMinutes: 10,
-                  userPlaying: streams.data?[index].userName,
-                );
-              });
+          if (streams.data?.isEmpty == true) {
+            return const Text(
+              "It's pretty empty around here.\nTry playing something!",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18),
+            );
+          } else {
+            return ListView.builder(
+                itemCount: streams.data?.length,
+                itemBuilder: (context, index) {
+                  return activityCard(streamData: streams.data![index]);
+                });
+          }
         } else {
           return const CircularProgressIndicator();
         }
@@ -123,37 +112,9 @@ class _ActivityState extends State<_ActivityWidget> {
     );
   }
 
-  Widget infiniteListView({int itemCount = 10}) {
-    return Scrollbar(
-      child: NotificationListener<ScrollNotification>(
-        child: ListView.builder(
-          itemCount: itemCount,
-          itemBuilder: (context, index) {
-            return activityCard(
-              titleName: "Friends",
-              seasonNumber: 1,
-              episodeNumber: 10,
-              episodeTitle: "My Episode Title",
-              currentSeconds: 09,
-              currentMinutes: 2,
-              totalSeconds: 4,
-              totalMinutes: 09,
-              userPlaying: "joshl",
-            );
-          }, // itemBuilder
-        ),
-        onNotification: (notification) {
-          // todo: how to use notifications.depth? Use this to rewrite the AppBar title
-          return false; // must return false to allow additional notifications to arrive; from: https://stackoverflow.com/a/65653695
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     isLoginAvailable();
-    // return infiniteListView();
     return activityListView();
   }
 }

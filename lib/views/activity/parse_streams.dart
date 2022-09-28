@@ -6,14 +6,15 @@ enum MediaType { movie, episode, unknown }
 class StreamsData {
   late final String masterName;
   // late final int completionPercentage; // Not everything shows completion percentage under NowPlayingItem. Not sure why.
-  late final int? seasonNum;
-  late final int? episodeNum;
-  late final String? episodeTitle;
+  late final int seasonNum;
+  late final int episodeNum;
+  late final String episodeTitle;
   late final int releaseYear;
   late final MediaType mediaType;
   late final String remoteURL;
   late final String mediaID;
   late final String userName;
+  late final String imagePath;
 }
 
 Future<List<StreamsData>> startParse() async {
@@ -31,39 +32,67 @@ Future<List<StreamsData>> startParse() async {
     if (await currentStream["NowPlayingItem"] != null) {
       StreamsData data = StreamsData();
 
-      // Build a new StreamsData instance to add to our list
-      print(await currentStream["PlayState"]);
-      data.masterName = await currentStream["NowPlayingItem"]["SeriesName"];
-      data.seasonNum = await getSeasonName(currentStream);
-      data.episodeNum = await getEpisodeIndex(currentStream);
       data.episodeTitle = await currentStream["NowPlayingItem"]["Name"];
       data.releaseYear = await currentStream["NowPlayingItem"]["ProductionYear"];
-      data.mediaType = getMediaType(currentStream);
       data.remoteURL = await currentStream["RemoteEndPoint"];
-      data.mediaID = await currentStream["Id"];
+      data.mediaType = getMediaType(currentStream);
       data.userName = await currentStream["UserName"];
+      data.seasonNum = await getSeasonNum(currentStream); // -1 if not a series
+      data.episodeNum = await getEpisodeNum(currentStream); // -1 if not a series
+
+      // Build a new StreamsData instance to add to our list
+      // Get the series name or the movie name
+      if (await currentStream["NowPlayingItem"]["SeriesName"] != null) {
+        data.masterName = await currentStream["NowPlayingItem"]["SeriesName"];
+      } else {
+        data.masterName = await currentStream["NowPlayingItem"]["Name"];
+      }
+
+      // Get the seasonId if series, otherwise get Id for movies
+      if (data.mediaType == MediaType.episode) {
+        data.mediaID = await currentStream["NowPlayingItem"]["SeriesId"];
+      } else if (data.mediaType == MediaType.movie) {
+        data.mediaID = await currentStream["NowPlayingItem"]["Id"];
+      }
+
+      data.imagePath = await GETImage.getItemImageURL(id: data.mediaID);
       nowPlayingStreams.add(data);
     }
   }
   return nowPlayingStreams;
 }
 
-Future<int> getSeasonName(Map<String, dynamic> stream) async {
+Future<int> getSeasonNum(Map<String, dynamic> stream) async {
   /// This function gets the integer from "Season ##"
   ///
   /// Example: "Season 1" is in `stream`, then int(1) is returned
   ///          "Season 10" is in `stream`, then int(10) is returned
-  String seasonName = await stream["NowPlayingItem"]["SeasonName"];
-  seasonName = seasonName.split(" ").last;
-  return int.parse(seasonName);
+  String? seasonName = await stream["NowPlayingItem"]["SeasonName"];
+
+  // Working with something other than an episode
+  if (seasonName == null) {
+    return -1;
+  } else {
+    // Using a episode number
+    seasonName = seasonName.split(" ").last;
+    return int.parse(seasonName);
+  }
 }
 
-Future<int> getEpisodeIndex(Map<String, dynamic> stream) async {
+Future<int> getEpisodeNum(Map<String, dynamic> stream) async {
   /// This function gets the integer from "Episode ##"
   ///
   /// Example: "Episode 1" is in `stream`, then int(1) is returned
   ///          "Episode 10" is in `stream`, then int(10) is returned
-  return await stream["NowPlayingItem"]["IndexNumber"];
+  int? episodeNum = await stream["NowPlayingItem"]["IndexNumber"];
+
+  // Not working with an episode
+  if (episodeNum == null) {
+    return -1;
+  } else {
+    // Using an episode number
+    return episodeNum;
+  }
 }
 
 MediaType getMediaType(Map<String, dynamic> stream) {

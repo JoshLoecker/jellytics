@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:jellytics/api/authentication.dart';
 import 'package:jellytics/api/paths.dart';
@@ -16,6 +17,7 @@ class _SettingsState extends State<_SettingsWidget> {
   String _serverURL = "";
   final SecureStorage _storage = SecureStorage();
   String _loginError = "";
+  late final String _message;
 
   void getLoginData() async {
     if (_username != "" && _password != "" && _serverURL != "") {
@@ -26,26 +28,22 @@ class _SettingsState extends State<_SettingsWidget> {
       );
 
       // Validate user is logged in
-      final String message;
       GETSystem systemData = GETSystem();
       if (!await systemData.isLoggedIn()) {
-        message = "Error logging in! "
+        _message = "Error logging in! "
             "Check that your 'Server URL' starts with "
             "'http://' or 'https://', "
             "and ends in a port number (default http Jellyfin port is 8096).";
       } else {
-        message = "Successfully logged in!";
+        _message = "Successfully logged in!";
       }
-      setState(() {
-        _loginError = message;
-      });
-
-      // Add the token to secure storage to be able to read from it later
-      _storage.addItem(key: LoginKeys.serverURL, value: _serverURL);
-      //_storage.addItem(key: LoginKeys.mediaBrowser, value: login.mediaBrowser);
-      //_storage.addItem(key: LoginKeys.mediaToken, value: login.mediaToken);
-      //_storage.addItem(key: LoginKeys.userID, value: login.userID);
+    } else if (await _storage.getMediaBrowser() != "") {
+      _message = "Successfully logged in!";
     }
+
+    setState(() {
+      _loginError = _message;
+    });
   }
 
   void clearStorageData() async {
@@ -58,6 +56,28 @@ class _SettingsState extends State<_SettingsWidget> {
 
   Future<String> setInitialValue(LoginKeys key) async {
     return await _storage.getItem(key: key);
+  }
+
+  Widget debugSecureStorage() {
+    /// Show several secure storage buttons if we are in debug mode
+    ///
+    /// If we are not debugging, simply return empty Text
+    if (kDebugMode) {
+      return Column(
+        children: <Widget>[
+          ElevatedButton(
+            onPressed: clearStorageData,
+            child: const Text("Clear SecureStorage"),
+          ),
+          ElevatedButton(
+            onPressed: printStorageItems,
+            child: const Text("Print Storage Items"),
+          ),
+        ],
+      );
+    } else {
+      return const Text("");
+    }
   }
 
   @override
@@ -78,6 +98,7 @@ class _SettingsState extends State<_SettingsWidget> {
         ),
         TextFormField(
           initialValue: "cheap-wrist-refined-BUILT-rafter-nutria-tedious-molar",
+          obscureText: true,
           onChanged: (input) {
             setState(() {
               _password = input;
@@ -103,13 +124,7 @@ class _SettingsState extends State<_SettingsWidget> {
           onPressed: getLoginData,
           child: const Text("Log in"),
         ),
-        ElevatedButton(
-          onPressed: clearStorageData,
-          child: const Text("Clear SecureStorage"),
-        ),
-        ElevatedButton(
-            onPressed: printStorageItems,
-            child: const Text("Print Storage Items")),
+        debugSecureStorage(), // Used in debugging, not present in release mode
         Text(
           _loginError,
           softWrap: true,

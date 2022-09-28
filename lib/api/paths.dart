@@ -1,7 +1,6 @@
 // This is a library that contains the paths to the different pages of the app.
 import 'package:dio/dio.dart';
 import 'package:jellytics/api/async_requests.dart';
-import 'package:jellytics/api/authentication.dart';
 import 'package:jellytics/api/print.dart';
 import 'package:jellytics/utils/secure_storage.dart';
 
@@ -49,8 +48,6 @@ class GETPlugins extends _Plugins {
   static GET allPlugins = GET(_Plugins._basePath);
 
   void getPlugins() async {
-    SecureStorage storage = SecureStorage();
-
     CreateRequest request = await CreateRequest.construct();
 
     var data = await request.get(allPlugins);
@@ -59,7 +56,7 @@ class GETPlugins extends _Plugins {
 }
 
 class _System {
-  static String _basePath = "/System";
+  static const String _basePath = "/System";
   static GET endpoint = GET("$_basePath/EndPoint");
   static GET info = GET("$_basePath/Info");
   static GET allLogs = GET("$_basePath/Logs");
@@ -86,8 +83,6 @@ class GETSystem extends _System {
 }
 
 class _Session {
-  late final LoginObject login;
-
   _Session();
 
   static const String _basePath = "/Sessions";
@@ -107,5 +102,14 @@ class GETSession extends _Session {
       },
     );
     return await streams.data;
+  }
+}
+
+class GETImage {
+  static Future<String> getItemImageURL({required String id}) async {
+    SecureStorage storage = SecureStorage();
+    await storage.isLoginSetup();
+
+    return "${await storage.getServerURL()}/Items/$id/Images/Primary";
   }
 }
