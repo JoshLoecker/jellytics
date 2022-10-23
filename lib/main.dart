@@ -7,7 +7,6 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FlutterNativeSplash.remove(); // App is built, OK to remove splash screen
     return MaterialApp(
       title: "Jellytics",
       theme: ThemeData(brightness: Brightness.light), // light mode
@@ -29,6 +28,13 @@ class StatefulApp extends StatefulWidget {
 class _StatefulApp extends State<StatefulApp> {
   int _currentNavIndex = 0;
   final String _appBarTitle = "Jellytics";
+
+  @override
+  void initState() {
+    super.initState();
+
+    FlutterNativeSplash.remove(); // App is built, OK to remove splash screen
+  }
 
   @override
   Widget build(BuildContext context) {

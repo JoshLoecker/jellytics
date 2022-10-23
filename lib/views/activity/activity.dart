@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jellytics/utils/secure_storage.dart';
 import 'package:jellytics/views/activity/get_activity.dart';
+import 'package:jellytics/utils/screens.dart';
 
 class _ActivityWidget extends StatefulWidget {
   const _ActivityWidget();
@@ -18,16 +19,11 @@ class _ActivityState extends State<_ActivityWidget> {
     await storage.isLoginSetup();
   }
 
-  Widget activityCard(
-      {required StreamsData streamData,
-      double maxHeight = 125,
-      MaterialColor containerColor = Colors.grey}) {
-    // Get the width of the safe area and subtract the left/right padding from it
-    // The resulting value is the maximum safe width we can make our widgets
-    double screenWidth = MediaQuery.of(context).size.width;
-    double paddingWidth = MediaQuery.of(context).padding.right * 2;
-    double maxSafeWidth = screenWidth - paddingWidth;
-
+  Widget activityCard({
+    required StreamsData streamData,
+    double maxCardHeight = 125,
+    MaterialColor containerColor = Colors.grey,
+  }) {
     // This is the 2nd line, right below the Movie/Series title
     String detailLine = "";
     if (streamData.mediaType == MediaFormat.movie) {
@@ -37,62 +33,56 @@ class _ActivityState extends State<_ActivityWidget> {
           "S${streamData.seasonNum} E${streamData.episodeNum} - ${streamData.episodeTitle}";
     }
 
-    return ConstrainedBox(
-      constraints: BoxConstraints.expand(
-        width: maxSafeWidth,
-        height: maxHeight,
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: containerColor,
-          borderRadius: const BorderRadius.all(
-            Radius.circular(10),
+    return defaultCard(
+      context: context,
+      maxCardHeight: maxCardHeight,
+      containerChild: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          // Image artwork
+          Container(
+            alignment: Alignment.center,
+            child: Image.network(streamData.imagePath),
           ),
-        ),
-        padding: const EdgeInsets.all(10),
-        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              alignment: Alignment.center,
-              child: Image.network(streamData.imagePath),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: Column(
-                  // Place contents at top-right corner, with small padding amount (padding defined above)
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Text(streamData.masterName),
-                    Text(detailLine),
-                    Text(streamData.userName),
-                  ],
-                ),
+          // Text information (playing title, year, user)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(5),
+              child: Column(
+                // Place contents at top-right corner, with small padding amount (padding defined above)
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Text(streamData.masterName),
+                  Text(detailLine),
+                  Text(streamData.userName),
+                ],
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.end, // place at bottom of card
-              children: const <Widget>[
-                Icon(Icons.play_circle),
-              ],
-            )
-          ],
-        ),
+          ),
+          // Play icon in lower right
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.end, // place at bottom of card
+            children: const <Widget>[
+              Icon(Icons.play_circle),
+            ],
+          )
+        ],
       ),
     );
   }
 
-  Widget activityListView() {
+  @override
+  Widget build(BuildContext context) {
+    isLoginAvailable(); // ensure login data is available
+
     return FutureBuilder(
       future: getActivity(),
-      builder: (context, AsyncSnapshot<List<StreamsData>> streams) {
-        if (streams.hasData) {
-          if (streams.data?.isEmpty == true) {
+      builder: (context, AsyncSnapshot<List<StreamsData>> futures) {
+        if (futures.hasData) {
+          if (futures.data?.isEmpty == true) {
             return const Text(
               "It's pretty empty around here.\nTry playing something!",
               textAlign: TextAlign.center,
@@ -100,9 +90,9 @@ class _ActivityState extends State<_ActivityWidget> {
             );
           } else {
             return ListView.builder(
-                itemCount: streams.data?.length,
+                itemCount: futures.data?.length,
                 itemBuilder: (context, index) {
-                  return activityCard(streamData: streams.data![index]);
+                  return activityCard(streamData: futures.data![index]);
                 });
           }
         } else {
@@ -110,12 +100,6 @@ class _ActivityState extends State<_ActivityWidget> {
         }
       },
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    isLoginAvailable();
-    return activityListView();
   }
 }
 

@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:jellytics/api/async_requests.dart';
 import 'package:jellytics/api/print.dart';
 import 'package:jellytics/utils/secure_storage.dart';
+import 'package:jellytics/views/library/get_library.dart';
 import 'package:jellytics/views/library/query.dart';
 
 enum RequestType {
@@ -117,24 +118,32 @@ class GETImage {
 
 class GETLibrary {
   final SecureStorage _storage = SecureStorage();
-  Response? _response;
 
-  Future<void> getLibraries() async {
+  Future<Map<String, dynamic>> getLibraries() async {
     CreateRequest request = await CreateRequest.construct();
     final GET getItems = GET("/Items");
 
-    _response = await request.get(getItems, queryParameters: {
-      "userId": await _storage.getUserID(),
-    });
-    prettyPrintJSON(_response?.data);
+    //Response response = await request.get(getItems, queryParameters: {
+    //  "userId": await _storage.getUserID(),
+    //});
+
+    // Return library JSON data
+    return await request.get(
+      getItems,
+      queryParameters: {
+        "userId": await _storage.getUserID(),
+      },
+    ).then((response) => response.data);
   }
 
-  Future<void> getItems({
+  Future<Map<String, dynamic>> getItems({
     required List<BaseItemKind> includeKind,
     required List<Field> fields,
     List<BaseItemKind> excludeKind = const <BaseItemKind>[],
     int limit = 1,
   }) async {
+    /// This function gets items based on an imput query
+
     CreateRequest request = await CreateRequest.construct();
 
     // Construct the query parameters
@@ -154,18 +163,25 @@ class GETLibrary {
     final GET items = GET(
       "/Users/${await _storage.getUserID()}/Items?IncludeItemTypes=$includeKindString&$excludeKindString&Recursive=True&startIndex=0&limit=$limit&Fields=$fieldString",
     );
-    Response response = await request.get(items);
-    prettyPrintJSON(response.data);
+
+    return await request.get(items).then((response) => response.data);
   }
 
-  Future<void> getUserMovies() async {
+  Future<Map<String, dynamic>> getByParentID(
+      {required SpecificLibraryInfo parentInfo}) async {
+    CreateRequest request = await CreateRequest.construct();
+    final GET items = GET(
+        "/Users/${await _storage.getUserID()}/Items?parentId=${parentInfo.id}&includeItemType=${parentInfo.baseItemKind.name}");
+
+    return await request.get(items).then((response) => response.data);
+  }
+
+  Future<Map<String, dynamic>> getUserMovies() async {
     CreateRequest request = await CreateRequest.construct();
     final GET userMovies = GET(
       "/Users/${await _storage.getUserID()}/Items?IncludeItemTypes=movie&Recursive=True&startIndex=0&limit=1&Fields=MediaStreams,Path",
     );
 
-    // Response realResponse = await request.get(userMovies);
-    _response = await request.get(userMovies);
-    prettyPrintJSON(await _response?.data);
+    return await request.get(userMovies).then((response) => response.data);
   }
 }
