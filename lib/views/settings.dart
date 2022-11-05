@@ -17,7 +17,7 @@ class _SettingsState extends State<_SettingsWidget> {
   String _serverURL = "";
   final SecureStorage _storage = SecureStorage();
   String _loginError = "";
-  late final String _message;
+  String _message = "";
 
   void getLoginData() async {
     if (_username != "" && _password != "" && _serverURL != "") {
@@ -39,6 +39,10 @@ class _SettingsState extends State<_SettingsWidget> {
       }
     } else if (await _storage.getMediaBrowser() != "") {
       _message = "Successfully logged in!";
+    } else {
+      _message = "username is $_username\n"
+          "password is $_password\n"
+          "serverURL is $_serverURL";
     }
 
     setState(() {
@@ -89,6 +93,7 @@ class _SettingsState extends State<_SettingsWidget> {
           onChanged: (input) {
             setState(() {
               _username = input;
+              _message = "";
             });
           },
           decoration: const InputDecoration(
@@ -117,8 +122,9 @@ class _SettingsState extends State<_SettingsWidget> {
             });
           },
           decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: "Server URL: http://192.168.1.20:8096"),
+            border: OutlineInputBorder(),
+            hintText: "Server URL: http://192.168.1.20:8096",
+          ),
         ),
         ElevatedButton(
           onPressed: getLoginData,

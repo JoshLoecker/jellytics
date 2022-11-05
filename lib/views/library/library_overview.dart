@@ -13,7 +13,7 @@ class _LibraryOverview extends StatefulWidget {
 
 class _LibraryOverviewState extends State<_LibraryOverview> {
   Widget libraryCard({
-    required SpecificLibraryInfo libraryData,
+    required LibraryOverviewInfo libraryData,
     double maxCardHeight = 125,
   }) {
     Widget child = InkWell(
@@ -28,7 +28,7 @@ class _LibraryOverviewState extends State<_LibraryOverview> {
         context: context,
         containerChild: Container(
           alignment: Alignment.center,
-          child: Text(libraryData.libraryName),
+          child: Text(libraryData.name),
         ),
       ),
     );
@@ -49,7 +49,7 @@ class _LibraryOverviewState extends State<_LibraryOverview> {
       // Use a GridView.list
       return FutureBuilder(
           future: getUserLibraries(),
-          builder: (context, AsyncSnapshot<List<SpecificLibraryInfo>> futures) {
+          builder: (context, AsyncSnapshot<List<LibraryOverviewInfo>> futures) {
             if (futures.hasData) {
               return ListView.builder(
                 itemCount: futures.data?.length,

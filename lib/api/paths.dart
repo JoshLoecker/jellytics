@@ -108,11 +108,24 @@ class GETSession extends _Session {
 }
 
 class GETImage {
-  static Future<String> getItemImageURL({required String id}) async {
+  static Future<String> itemImageURL({required String id}) async {
     SecureStorage storage = SecureStorage();
     await storage.isLoginSetup();
 
     return "${await storage.getServerURL()}/Items/$id/Images/Primary";
+  }
+
+  static Future<List<dynamic>> getImageInfoPath({
+    required String id,
+  }) async {
+    SecureStorage storage = SecureStorage();
+    await storage.isLoginSetup();
+
+    CreateRequest request = await CreateRequest.construct();
+    final GET path = GET("${await storage.getServerURL()}/Items/$id/Images");
+
+    // List<Map<String, dynamic>>
+    return await request.get(path).then((value) => value.data);
   }
 }
 
@@ -167,13 +180,23 @@ class GETLibrary {
     return await request.get(items).then((response) => response.data);
   }
 
-  Future<Map<String, dynamic>> getByParentID(
-      {required SpecificLibraryInfo parentInfo}) async {
+  Future<Map<String, dynamic>> getByParentID({
+    required LibrarySuper parentInfo,
+  }) async {
     CreateRequest request = await CreateRequest.construct();
     final GET items = GET(
         "/Users/${await _storage.getUserID()}/Items?parentId=${parentInfo.id}&includeItemType=${parentInfo.baseItemKind.name}");
-
     return await request.get(items).then((response) => response.data);
+  }
+
+  Future<Map<String, dynamic>> getByID({
+    required LibraryDetailInfo itemInfo,
+  }) async {
+    CreateRequest request = await CreateRequest.construct();
+    final GET itemPath =
+        GET("/Users/${await _storage.getUserID()}/Items/${itemInfo.id}");
+
+    return await request.get(itemPath).then((response) => response.data);
   }
 
   Future<Map<String, dynamic>> getUserMovies() async {
