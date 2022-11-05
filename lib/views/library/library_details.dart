@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jellytics/utils/screens.dart';
+import 'package:jellytics/data_classes/libraries.dart';
 import 'package:jellytics/views/library/item_details.dart';
 import 'package:jellytics/views/library/get_library.dart';
 
@@ -29,7 +30,7 @@ class _LibraryDetailsState extends State<LibraryDetails> {
         context: context,
         containerChild: Container(
           alignment: Alignment.center,
-          child: Text(itemInfo.name.toString()),
+          child: Text(itemInfo.libraryData.name.toString()),
         ),
       ),
     );
@@ -39,7 +40,7 @@ class _LibraryDetailsState extends State<LibraryDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("${widget.libraryData.name} Library"),
+        title: Text("${widget.libraryData.libraryData.name} Library"),
       ),
       body: FutureBuilder(
         future: getLibraryDetails(widget.libraryData),

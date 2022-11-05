@@ -18,28 +18,28 @@ class LibrarySuper with _$LibrarySuper {
 @freezed
 class LibraryOverviewInfo with _$LibraryOverviewInfo {
   const factory LibraryOverviewInfo({
-    required LibrarySuper librarySuper,
+    required LibrarySuper libraryData,
   }) = _LibraryOverviewInfo;
 }
 
 @freezed
 class LibraryDetailInfo with _$LibraryDetailInfo {
   const factory LibraryDetailInfo({
-    required LibrarySuper librarySuper,
+    required LibrarySuper libraryData,
   }) = _LibraryDetailInfo;
 }
 
 @freezed
 class ItemDetailInfo with _$ItemDetailInfo {
   const factory ItemDetailInfo({
-    required LibrarySuper librarySuper,
+    required LibrarySuper libraryData,
     required String imagePath,
     required String backdropImagePath,
     required List<dynamic> imageInfo,
-    required String overview,
-    required String genre,
-    required String releaseYear, // ProductionYear
-    required String tmdbId, //ProviderIds["Tmdb"]
-    required String imdb, //ProviderIds["Imdb"]
+    required String? overview,
+    required String? genre,
+    required String? releaseYear, // ProductionYear
+    required String? tmdbId, //ProviderIds["Tmdb"]
+    required String? imdb, //ProviderIds["Imdb"]
   }) = _ItemDetailInfo;
 }

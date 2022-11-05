@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:jellytics/utils/screens.dart';
+import 'package:jellytics/data_classes/libraries.dart';
 import 'package:jellytics/views/library/get_library.dart';
 import 'package:jellytics/views/library/library_details.dart';
 
@@ -28,7 +29,7 @@ class _LibraryOverviewState extends State<_LibraryOverview> {
         context: context,
         containerChild: Container(
           alignment: Alignment.center,
-          child: Text(libraryData.name),
+          child: Text(libraryData.libraryData.name),
         ),
       ),
     );
@@ -44,46 +45,27 @@ class _LibraryOverviewState extends State<_LibraryOverview> {
 
   @override
   Widget build(BuildContext context) {
-    // In debug mode!
-    if (kDebugMode) {
-      // Use a GridView.list
-      return Scrollbar(
-        child: FutureBuilder(
-          future: getUserLibraries(),
-          builder: (context, AsyncSnapshot<List<LibraryOverviewInfo>> futures) {
-            if (futures.hasData) {
-              return ListView.builder(
-                itemCount: futures.data?.length,
-                itemBuilder: (context, index) {
-                  return libraryCard(
-                    libraryData: futures.data![index],
-                  );
-                },
-              );
-            } else {
-              Future.delayed(const Duration(seconds: 1));
-              return const Center(child: CircularProgressIndicator());
-            }
-          },
-        ),
-      );
-
-      // In production mode!
-    } else {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const <Widget>[
-          Text(
-            "Index 1: Library",
-            style: TextStyle(
-              fontSize: 25,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text("Sorry, this screen isn't set up yet."),
-        ],
-      );
-    }
+    // Use a GridView.list
+    return Scrollbar(
+      child: FutureBuilder(
+        future: getUserLibraries(),
+        builder: (context, AsyncSnapshot<List<LibraryOverviewInfo>> futures) {
+          if (futures.hasData) {
+            return ListView.builder(
+              itemCount: futures.data?.length,
+              itemBuilder: (context, index) {
+                return libraryCard(
+                  libraryData: futures.data![index],
+                );
+              },
+            );
+          } else {
+            Future.delayed(const Duration(seconds: 1));
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
+    );
   }
 }
 

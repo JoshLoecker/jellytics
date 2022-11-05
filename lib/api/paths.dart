@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:jellytics/api/async_requests.dart';
 import 'package:jellytics/api/print.dart';
 import 'package:jellytics/utils/secure_storage.dart';
+import 'package:jellytics/data_classes/libraries.dart';
 import 'package:jellytics/views/library/get_library.dart';
 import 'package:jellytics/views/library/query.dart';
 
@@ -181,11 +182,11 @@ class GETLibrary {
   }
 
   Future<Map<String, dynamic>> getByParentID({
-    required LibrarySuper parentInfo,
+    required LibraryOverviewInfo parentInfo,
   }) async {
     CreateRequest request = await CreateRequest.construct();
     final GET items = GET(
-        "/Users/${await _storage.getUserID()}/Items?parentId=${parentInfo.id}&includeItemType=${parentInfo.baseItemKind.name}");
+        "/Users/${await _storage.getUserID()}/Items?parentId=${parentInfo.libraryData.id}&includeItemType=${parentInfo.libraryData.baseItemKind.name}");
     return await request.get(items).then((response) => response.data);
   }
 
@@ -193,8 +194,8 @@ class GETLibrary {
     required LibraryDetailInfo itemInfo,
   }) async {
     CreateRequest request = await CreateRequest.construct();
-    final GET itemPath =
-        GET("/Users/${await _storage.getUserID()}/Items/${itemInfo.id}");
+    final GET itemPath = GET(
+        "/Users/${await _storage.getUserID()}/Items/${itemInfo.libraryData.id}");
 
     return await request.get(itemPath).then((response) => response.data);
   }

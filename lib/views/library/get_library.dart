@@ -1,61 +1,10 @@
 /// This file is responsible for gathering and formatting library items (tv shows and movies)
 
 import 'package:jellytics/api/print.dart';
-import 'package:jellytics/views/library/query.dart';
 import 'package:jellytics/api/paths.dart';
+import 'package:jellytics/views/library/query.dart';
 import 'package:jellytics/utils/secure_storage.dart';
-
-class LibrarySuper {
-  LibrarySuper({
-    required this.name,
-    required this.id,
-    required this.baseItemKind,
-  });
-  late final String name;
-  late final String id;
-  late final BaseItemKind baseItemKind;
-}
-
-class LibraryOverviewInfo extends LibrarySuper {
-  LibraryOverviewInfo({
-    required libraryName,
-    required id,
-    required baseItemKind,
-  }) : super(name: libraryName, id: id, baseItemKind: baseItemKind);
-}
-
-class LibraryDetailInfo extends LibrarySuper {
-  LibraryDetailInfo({
-    required name,
-    required id,
-    required baseItemKind,
-  }) : super(name: name, id: id, baseItemKind: baseItemKind);
-}
-
-class ItemDetailInfo extends LibrarySuper {
-  late final String imagePath;
-  late final String backdropImagePath;
-  late final List<dynamic> imageInfo;
-  late final String overview;
-  late final String genre;
-  late final String releaseYear; // ProductionYear
-  late final String tmdbId; //ProviderIds["Tmdb"]
-  late final String imdb; //ProviderIds["Imdb"]
-
-  ItemDetailInfo({
-    required name,
-    required id,
-    required baseItemKind,
-    required this.imagePath,
-    required this.backdropImagePath,
-    required this.imageInfo,
-    required this.overview,
-    required this.genre,
-    required this.releaseYear,
-    required this.tmdbId,
-    required this.imdb,
-  }) : super(name: name, id: id, baseItemKind: baseItemKind);
-}
+import 'package:jellytics/data_classes/libraries.dart';
 
 Future<List<LibraryOverviewInfo>> getUserLibraries() async {
   /// This function will get a list of the user's libraries
@@ -69,17 +18,22 @@ Future<List<LibraryOverviewInfo>> getUserLibraries() async {
     if (item["CollectionType"].toString().toLowerCase() == "boxsets") {
       continue;
     }
-    libraries.add(LibraryOverviewInfo(
-      libraryName: item["Name"],
-      baseItemKind: BaseItemKind.values.firstWhere(
-        (element) => element.name.toLowerCase() == item["Type"].toLowerCase(),
+    libraries.add(
+      LibraryOverviewInfo(
+        libraryData: LibrarySuper(
+          name: item["Name"],
+          id: item["Id"],
+          baseItemKind: BaseItemKind.values.firstWhere(
+            (element) =>
+                element.name.toLowerCase() == item["Type"].toLowerCase(),
+          ),
+        ),
       ),
-      id: item["Id"],
-    ));
+    );
   }
 
   // Sort libraries based on libraryName; from: https://stackoverflow.com/a/53549197
-  libraries.sort((a, b) => a.name.compareTo(b.name));
+  libraries.sort((a, b) => a.libraryData.name.compareTo(b.libraryData.name));
   return libraries;
 }
 
@@ -99,15 +53,22 @@ Future<List<LibraryDetailInfo>> getLibraryDetails(
       continue;
     }
 
-    libraryItems.add(LibraryDetailInfo(
-      name: item["Name"],
-      baseItemKind: BaseItemKind.values.firstWhere((element) =>
-          element.name.toLowerCase() == item["Type"].toLowerCase()),
-      id: item["Id"],
-    ));
+    libraryItems.add(
+      LibraryDetailInfo(
+        libraryData: LibrarySuper(
+          name: item["Name"],
+          id: item["Id"],
+          baseItemKind: BaseItemKind.values.firstWhere(
+            (element) =>
+                element.name.toLowerCase() == item["Type"].toLowerCase(),
+          ),
+        ),
+      ),
+    );
   }
-  libraryItems
-      .sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+  libraryItems.sort((a, b) => a.libraryData.name
+      .toLowerCase()
+      .compareTo(b.libraryData.name.toLowerCase()));
   return libraryItems;
 }
 
@@ -116,30 +77,30 @@ Future<ItemDetailInfo> getLibraryItemDetails(
   /// This function will get details of a library item (i.e., details of a specific show, movie, etc.)
   ///
   GETLibrary getByID = GETLibrary();
-  String backdropImagePath = "";
-
+  Map<String, dynamic> idData = await getByID.getByID(itemInfo: itemInfo);
   List<dynamic> imagePathInfo =
-      await GETImage.getImageInfoPath(id: itemInfo.id);
+      await GETImage.getImageInfoPath(id: itemInfo.libraryData.id);
   int backdropImageIndex = imagePathInfo.indexWhere(
       (element) => element["ImageType"].toLowerCase() == "backdrop");
-  Map<String, dynamic> idData = await getByID.getByID(itemInfo: itemInfo);
 
-  if (backdropImageIndex != -1) {
-    backdropImagePath =
-        "${await secureStorage.getServerURL()}/Items/${itemInfo.id}/Images/Backdrop";
-  }
-
-  return ItemDetailInfo(
-    name: itemInfo.name,
-    id: itemInfo.id,
-    baseItemKind: itemInfo.baseItemKind,
-    imagePath: await GETImage.itemImageURL(id: itemInfo.id),
-    backdropImagePath: backdropImagePath,
+  ItemDetailInfo data = ItemDetailInfo(
+    libraryData: LibrarySuper(
+      name: itemInfo.libraryData.name,
+      id: itemInfo.libraryData.id,
+      baseItemKind: itemInfo.libraryData.baseItemKind,
+    ),
+    imagePath: await GETImage.itemImageURL(id: itemInfo.libraryData.id),
+    backdropImagePath: backdropImageIndex != -1
+        ? "${await secureStorage.getServerURL()}/Items/${itemInfo.libraryData.id}/Images/Backdrop"
+        : "",
     imageInfo: imagePathInfo,
     overview: await idData["Overview"],
-    genre: await idData["Genres"].join(", "),
-    releaseYear: idData["ProductionYear"].toString(),
+    genre: idData["Genres"].toString() == "[]" // empty list. How to compare?
+        ? null
+        : idData["Genres"].join(", "),
+    releaseYear: await idData["ProductionYear"],
     tmdbId: await idData["ProviderIds"]["Tmdb"],
     imdb: await idData["ProviderIds"]["Imdb"],
   );
+  return data;
 }

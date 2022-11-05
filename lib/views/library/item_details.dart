@@ -1,6 +1,7 @@
 /// This file is to be used to display information about specific items in the library
 /// It  will be called from library_details after gathering the specific library's items
 import 'package:flutter/material.dart';
+import 'package:jellytics/data_classes/libraries.dart';
 import 'package:jellytics/utils/secure_storage.dart';
 import 'package:jellytics/views/library/get_library.dart';
 import 'package:jellytics/utils/screens.dart';
@@ -14,30 +15,38 @@ class LibraryItemDetails extends StatefulWidget {
 
   final LibraryDetailInfo itemInfo;
   final SecureStorage secureStorage = SecureStorage();
+  bool noData = false;
+  List<String> missingValues = <String>[];
 
   @override
   State<LibraryItemDetails> createState() => _LibraryItemDetailsState();
 }
 
 class _LibraryItemDetailsState extends State<LibraryItemDetails> {
-  Widget rowDetails(String header, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        Container(
-          padding: const EdgeInsets.fromLTRB(5, 5, 3, 5),
-          child: Text(
-            header,
+  Widget rowDetails(String header, String? value) {
+    if (value == null) {
+      widget.missingValues.add(header);
+      widget.noData = true;
+      return const SizedBox.shrink();
+    } else {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            padding: const EdgeInsets.fromLTRB(5, 5, 3, 5),
+            child: Text(
+              header,
+            ),
           ),
-        ),
-        Flexible(
-          child: Text(
-            value,
+          Flexible(
+            child: Text(
+              value,
+            ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
+    }
   }
 
   Widget itemDetails(ItemDetailInfo itemInfo) {
@@ -47,11 +56,12 @@ class _LibraryItemDetailsState extends State<LibraryItemDetails> {
           placeholder: MemoryImage(kTransparentImage),
           image: NetworkImage(itemInfo.backdropImagePath),
           width: MediaQuery.of(context).size.width,
+          fadeInDuration: const Duration(milliseconds: 200),
         ),
         Container(
           padding: const EdgeInsets.all(10),
           child: Text(
-            itemInfo.name,
+            itemInfo.libraryData.name,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: MediaQuery.of(context).size.width * 0.1,
@@ -72,7 +82,7 @@ class _LibraryItemDetailsState extends State<LibraryItemDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.itemInfo.name),
+        title: Text(widget.itemInfo.libraryData.name),
       ),
       body: FutureBuilder(
         future: getLibraryItemDetails(widget.itemInfo, widget.secureStorage),
@@ -80,7 +90,23 @@ class _LibraryItemDetailsState extends State<LibraryItemDetails> {
           if (futures.hasData) {
             return Container(
               alignment: Alignment.center,
-              child: itemDetails(futures.data!),
+              child: Column(
+                children: <Widget>[
+                  itemDetails(futures.data!),
+                  //if (widget.noData)
+                  widget.noData
+                      ? Container(
+                          padding: const EdgeInsets.all(10),
+                          child: Text(
+                            "Missing data: ${widget.missingValues.join(", ")}\nAdd it in the jellyfin web interface",
+                            style: const TextStyle(
+                              color: Colors.red,
+                            ),
+                          ),
+                        )
+                      : const Text(""),
+                ],
+              ),
             );
           } else {
             return const Center(child: CircularProgressIndicator());
