@@ -12,9 +12,12 @@ Widget defaultCard({
       height: maxCardHeight,
     ),
     child: Container(
-        decoration: const BoxDecoration(
-          color: Colors.grey,
-          borderRadius: BorderRadius.all(
+        decoration: BoxDecoration(
+          // Set color of card background based on light/dark mode
+          color: MediaQuery.of(context).platformBrightness == Brightness.light
+              ? Colors.grey[350]
+              : Colors.grey[500],
+          borderRadius: const BorderRadius.all(
             Radius.circular(10),
           ),
         ),

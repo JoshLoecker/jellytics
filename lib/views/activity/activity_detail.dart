@@ -1,20 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:jellytics/utils/secure_storage.dart';
+import 'package:jellytics/data_classes/active_streams.dart';
 import 'package:jellytics/views/activity/get_activity.dart';
 import 'package:jellytics/utils/screens.dart';
 
-class _ActivityDetailWidget extends StatefulWidget {
-  const _ActivityDetailWidget();
+class ActivityDetailWidget extends StatefulWidget {
+  ActivityDetailWidget({required this.streamData, super.key});
+
+  final StreamsData streamData;
+  final SecureStorage secureStorage = SecureStorage();
 
   @override
-  State<_ActivityDetailWidget> createState() => _ActivityDetailWidgetState();
+  State<ActivityDetailWidget> createState() => _ActivityDetailWidgetState();
 }
 
-class _ActivityDetailWidgetState extends State<_ActivityDetailWidget> {
+class _ActivityDetailWidgetState extends State<ActivityDetailWidget> {
+  Future<String> getActivtyDetailView() async {
+    return "${widget.streamData.masterName}\n${widget.streamData.id}\n${widget.streamData.releaseYear}";
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Text("Activity Detail");
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.streamData.masterName),
+      ),
+      body: FutureBuilder(
+        future: getActivtyDetailView(),
+        builder: (context, AsyncSnapshot<String> futures) {
+          if (futures.hasData) {
+            return Text(futures.data!);
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
+    );
   }
 }
-
-const Widget activityContent = _ActivityDetailWidget();

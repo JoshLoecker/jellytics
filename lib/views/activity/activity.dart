@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jellytics/data_classes/active_streams.dart';
 import 'package:jellytics/views/activity/get_activity.dart';
+import 'package:jellytics/views/activity/activity_detail.dart';
 import 'package:jellytics/utils/secure_storage.dart';
 import 'package:jellytics/utils/screens.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -35,51 +36,62 @@ class _ActivityState extends State<_ActivityWidget> {
           "S${streamData.seasonNum} E${streamData.episodeNum} - ${streamData.episodeTitle}";
     }
 
-    return defaultCard(
-      context: context,
-      maxCardHeight: maxCardHeight,
-      containerChild: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          // Image artwork
-          Container(
-            alignment: Alignment.center,
-            width: 75,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(7),
-              child: FadeInImage(
-                placeholder: MemoryImage(kTransparentImage),
-                image: NetworkImage(streamData.imagePath),
-                fadeInDuration: const Duration(milliseconds: 200),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  ActivityDetailWidget(streamData: streamData)),
+        );
+      },
+      child: defaultCard(
+        context: context,
+        maxCardHeight: maxCardHeight,
+        containerChild: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            // Image artwork
+            Container(
+              alignment: Alignment.center,
+              width: 75,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(7),
+                child: FadeInImage(
+                  placeholder: MemoryImage(kTransparentImage),
+                  image: NetworkImage(streamData.imagePath),
+                  fadeInDuration: const Duration(milliseconds: 200),
+                ),
               ),
             ),
-          ),
-          // Text information (playing title, year, user)
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: Column(
-                // Place contents at top-right corner, with small padding amount (padding defined above)
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Text(streamData.masterName),
-                  Text(detailLine),
-                  Text(streamData.userName),
-                ],
+            // Text information (playing title, year, user)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(5),
+                child: Column(
+                  // Place contents at top-right corner, with small padding amount (padding defined above)
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Text(streamData.masterName),
+                    Text(detailLine),
+                    Text(streamData.userName),
+                  ],
+                ),
               ),
             ),
-          ),
-          // Play icon in lower right
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: MainAxisAlignment.end, // place at bottom of card
-            children: const <Widget>[
-              Icon(Icons.play_circle),
-            ],
-          )
-        ],
+            // Play icon in lower right
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment:
+                  MainAxisAlignment.end, // place at bottom of card
+              children: const <Widget>[
+                Icon(Icons.play_circle),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
