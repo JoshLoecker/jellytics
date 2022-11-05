@@ -64,7 +64,11 @@ Future<List<LibraryOverviewInfo>> getUserLibraries() async {
   Map<String, dynamic> response = await items.getLibraries();
   List<LibraryOverviewInfo> libraries = <LibraryOverviewInfo>[];
 
+  // Exclude collections from the list of libraries
   for (var item in response["Items"]) {
+    if (item["CollectionType"].toString().toLowerCase() == "boxsets") {
+      continue;
+    }
     libraries.add(LibraryOverviewInfo(
       libraryName: item["Name"],
       baseItemKind: BaseItemKind.values.firstWhere(
@@ -90,6 +94,11 @@ Future<List<LibraryDetailInfo>> getLibraryDetails(
   List<LibraryDetailInfo> libraryItems = <LibraryDetailInfo>[];
 
   for (var item in response["Items"]) {
+    // Exclude collections from the list of movies (i.e., boxsets)
+    if (item["Type"].toString().toLowerCase() == "boxset") {
+      continue;
+    }
+
     libraryItems.add(LibraryDetailInfo(
       name: item["Name"],
       baseItemKind: BaseItemKind.values.firstWhere((element) =>
