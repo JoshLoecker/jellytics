@@ -1,6 +1,5 @@
 import 'package:jellytics/api/paths.dart';
 import 'package:jellytics/data_classes/active_streams.dart';
-import 'package:jellytics/api/print.dart';
 
 Future<List<StreamsData>> getActivity() async {
   /// This function will build a list of StreamsData instances

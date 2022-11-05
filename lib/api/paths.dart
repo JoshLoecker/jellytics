@@ -4,7 +4,6 @@ import 'package:jellytics/api/async_requests.dart';
 import 'package:jellytics/api/print.dart';
 import 'package:jellytics/utils/secure_storage.dart';
 import 'package:jellytics/data_classes/libraries.dart';
-import 'package:jellytics/views/library/get_library.dart';
 import 'package:jellytics/views/library/query.dart';
 
 enum RequestType {
@@ -61,11 +60,12 @@ class GETPlugins extends _Plugins {
 class _System {
   static const String _basePath = "/System";
   static GET endpoint = GET("$_basePath/EndPoint");
-  static GET info = GET("$_basePath/Info");
-  static GET allLogs = GET("$_basePath/Logs");
-  static GET ping = GET("$_basePath/Ping");
-  static final GET log = GET("$allLogs/Log");
-  static final GET infoPublic = GET("$info/Public");
+  // Implement the following at some point
+  // static GET info = GET("$_basePath/Info");
+  // static GET allLogs = GET("$_basePath/Logs");
+  // static GET ping = GET("$_basePath/Ping");
+  // static final GET log = GET("$allLogs/Log");
+  // static final GET infoPublic = GET("$info/Public");
 }
 
 class GETSystem extends _System {

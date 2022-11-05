@@ -1,6 +1,5 @@
 /// This file is responsible for gathering and formatting library items (tv shows and movies)
 
-import 'package:jellytics/api/print.dart';
 import 'package:jellytics/api/paths.dart';
 import 'package:jellytics/views/library/query.dart';
 import 'package:jellytics/utils/secure_storage.dart';
@@ -83,7 +82,7 @@ Future<ItemDetailInfo> getLibraryItemDetails(
   int backdropImageIndex = imagePathInfo.indexWhere(
       (element) => element["ImageType"].toLowerCase() == "backdrop");
 
-  String release = await idData["ProductionYear"].toString();
+  String release = idData["ProductionYear"].toString();
 
   ItemDetailInfo data = ItemDetailInfo(
     libraryData: LibrarySuper(

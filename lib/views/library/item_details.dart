@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:jellytics/data_classes/libraries.dart';
 import 'package:jellytics/utils/secure_storage.dart';
 import 'package:jellytics/views/library/get_library.dart';
-import 'package:jellytics/utils/screens.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class LibraryItemDetails extends StatefulWidget {

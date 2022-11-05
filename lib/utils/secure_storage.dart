@@ -1,6 +1,7 @@
 /*
 This file implements flutter_secure_storage
 */
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 enum LoginKeys { serverURL, mediaBrowser, token, username, userID }
@@ -44,7 +45,6 @@ class SecureStorage {
         "DeviceId=$_deviceID, "
         "Version=${LoginObject._version}";
      */
-    String mediaBrowser = await getItem(key: LoginKeys.mediaBrowser);
 
     bool loginSetup = false;
     for (var value in LoginKeys.values) {
@@ -52,26 +52,29 @@ class SecureStorage {
         loginSetup = true;
       } else {
         loginSetup = false;
+        break;
       }
     }
     return loginSetup;
   }
 
   Future<void> clear() async {
-    print(
-      "Num before deleting: ${await _storage.readAll().then((value) => value.length)}",
-    );
-    await _storage.deleteAll(
-      iOptions: _getIOSOptions(),
-      aOptions: _getAndriodOptions(),
-    );
-    print(
-      "Num after deleting: ${await _storage.readAll().then((value) => value.length)}",
-    );
+    if (kDebugMode) {
+      print(
+        "Num before deleting: ${await _storage.readAll().then((value) => value.length)}",
+      );
+      await _storage.deleteAll(
+        iOptions: _getIOSOptions(),
+        aOptions: _getAndriodOptions(),
+      );
+      print(
+        "Num after deleting: ${await _storage.readAll().then((value) => value.length)}",
+      );
+    }
   }
 
   Future<void> printStorageItems() async {
-    print(await _storage.readAll());
+    if (kDebugMode) print(await _storage.readAll());
   }
 
   Future<String> getServerURL() async {
