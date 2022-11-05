@@ -102,7 +102,7 @@ class _SettingsState extends State<_SettingsWidget> {
           ),
         ),
         TextFormField(
-          initialValue: "cheap-wrist-refined-BUILT-rafter-nutria-tedious-molar",
+          initialValue: "",
           obscureText: true,
           onChanged: (input) {
             setState(() {
