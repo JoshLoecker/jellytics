@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:jellytics/utils/secure_storage.dart';
+import 'package:jellytics/data_classes/active_streams.dart';
 import 'package:jellytics/views/activity/get_activity.dart';
+import 'package:jellytics/utils/secure_storage.dart';
 import 'package:jellytics/utils/screens.dart';
 
 class _ActivityWidget extends StatefulWidget {
@@ -89,11 +90,14 @@ class _ActivityState extends State<_ActivityWidget> {
               style: TextStyle(fontSize: 18),
             );
           } else {
-            return ListView.builder(
+            return Scrollbar(
+              child: ListView.builder(
                 itemCount: futures.data?.length,
                 itemBuilder: (context, index) {
                   return activityCard(streamData: futures.data![index]);
-                });
+                },
+              ),
+            );
           }
         } else {
           return const CircularProgressIndicator();

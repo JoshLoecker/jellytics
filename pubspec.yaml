@@ -26,9 +26,10 @@ environment:
 dependencies:
   dio: ^4.0.6                      # async http requests
   fl_chart: ^0.55.1                # charts & graphs
+  flutter_launcher_icons: ^0.10.0  # Launch icons
   flutter_native_splash: ^2.2.9    # Loadup splash screen
   flutter_secure_storage: ^6.0.0   # For secure storage
-  flutter_launcher_icons: ^0.10.0  # Launch icons
+  freezed_annotation: ^2.2.0       # For data classes (freezed)
   transparent_image: ^2.0.0        # Transparent images
   flutter:
     sdk: flutter
@@ -38,8 +39,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  # See the `analysis_options.yaml` file for more information
-  flutter_lints: ^2.0.0
+  flutter_lints: ^2.0.0            # See the `analysis_options.yaml` file for more information
+  freezed: ^2.2.1                  # For data classes (freezed)
+  build_runner: ^2.3.2             # For data classes (freezed)
 
 flutter:
   uses-material-design: true

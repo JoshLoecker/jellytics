@@ -1,21 +1,6 @@
 import 'package:jellytics/api/paths.dart';
+import 'package:jellytics/data_classes/active_streams.dart';
 import 'package:jellytics/api/print.dart';
-
-enum MediaFormat { movie, episode, unknown }
-
-class StreamsData {
-  late final String masterName;
-  // late final int completionPercentage; // Not everything shows completion percentage under NowPlayingItem. Not sure why.
-  late final int seasonNum;
-  late final int episodeNum;
-  late final String episodeTitle;
-  late final int releaseYear;
-  late final MediaFormat mediaType;
-  late final String remoteURL;
-  late final String id;
-  late final String userName;
-  late final String imagePath;
-}
 
 Future<List<StreamsData>> getActivity() async {
   /// This function will build a list of StreamsData instances
@@ -30,34 +15,25 @@ Future<List<StreamsData>> getActivity() async {
     // Find streams that are playing media
     // We will add these to the nowPlayingStreams
     if (await currentStream["NowPlayingItem"] != null) {
-      StreamsData data = StreamsData();
+      MediaFormat mediaType = getMediaFormat(currentStream);
+      String id = (mediaType == MediaFormat.movie)
+          ? await currentStream["NowPlayingItem"]["Id"]
+          : await currentStream["NowPlayingItem"]["SeriesId"];
 
-      data.episodeTitle = await currentStream["NowPlayingItem"]["Name"];
-      data.releaseYear =
-          await currentStream["NowPlayingItem"]["ProductionYear"];
-      data.remoteURL = await currentStream["RemoteEndPoint"];
-      data.mediaType = getMediaFormat(currentStream);
-      data.userName = await currentStream["UserName"];
-      data.seasonNum = await getSeasonNum(currentStream); // -1 if not a series
-      data.episodeNum =
-          await getEpisodeNum(currentStream); // -1 if not a series
+      StreamsData data = StreamsData(
+        episodeTitle: await currentStream["NowPlayingItem"]["Name"],
+        releaseYear: await currentStream["NowPlayingItem"]["ProductionYear"],
+        remoteURL: await currentStream["RemoteEndPoint"],
+        mediaType: mediaType,
+        userName: await currentStream["UserName"],
+        seasonNum: await getSeasonNum(currentStream), // -1 if not a series
+        episodeNum: await getEpisodeNum(currentStream), // -1 if not a series
+        id: id,
+        imagePath: await GETImage.itemImageURL(id: id),
+        masterName: await currentStream["NowPlayingItem"]["SeriesName"] ??
+            await currentStream["NowPlayingItem"]["Name"],
+      );
 
-      // Build a new StreamsData instance to add to our list
-      // Get the series name or the movie name
-      if (await currentStream["NowPlayingItem"]["SeriesName"] != null) {
-        data.masterName = await currentStream["NowPlayingItem"]["SeriesName"];
-      } else {
-        data.masterName = await currentStream["NowPlayingItem"]["Name"];
-      }
-
-      // Get the seasonId if series, otherwise get Id for movies
-      if (data.mediaType == MediaFormat.episode) {
-        data.id = await currentStream["NowPlayingItem"]["SeriesId"];
-      } else if (data.mediaType == MediaFormat.movie) {
-        data.id = await currentStream["NowPlayingItem"]["Id"];
-      }
-
-      data.imagePath = await GETImage.itemImageURL(id: data.id);
       nowPlayingStreams.add(data);
     }
   }

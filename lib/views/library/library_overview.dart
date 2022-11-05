@@ -47,7 +47,8 @@ class _LibraryOverviewState extends State<_LibraryOverview> {
     // In debug mode!
     if (kDebugMode) {
       // Use a GridView.list
-      return FutureBuilder(
+      return Scrollbar(
+        child: FutureBuilder(
           future: getUserLibraries(),
           builder: (context, AsyncSnapshot<List<LibraryOverviewInfo>> futures) {
             if (futures.hasData) {
@@ -60,9 +61,12 @@ class _LibraryOverviewState extends State<_LibraryOverview> {
                 },
               );
             } else {
+              Future.delayed(const Duration(seconds: 1));
               return const Center(child: CircularProgressIndicator());
             }
-          });
+          },
+        ),
+      );
 
       // In production mode!
     } else {

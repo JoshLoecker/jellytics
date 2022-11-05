@@ -45,17 +45,19 @@ class _LibraryDetailsState extends State<LibraryDetails> {
         future: getLibraryDetails(widget.libraryData),
         builder: (context, AsyncSnapshot<List<LibraryDetailInfo>> futures) {
           if (futures.hasData) {
-            return ListView.builder(
-              itemCount: futures.data?.length,
-              itemBuilder: (context, index) {
-                return defaultCard(
-                    context: context,
-                    containerChild: Container(
-                      alignment: Alignment.center,
-                      // child: Text(futures.data![index].name),
-                      child: libraryDetails(futures.data![index]),
-                    ));
-              },
+            return Scrollbar(
+              child: ListView.builder(
+                itemCount: futures.data?.length,
+                itemBuilder: (context, index) {
+                  return defaultCard(
+                      context: context,
+                      containerChild: Container(
+                        alignment: Alignment.center,
+                        // child: Text(futures.data![index].name),
+                        child: libraryDetails(futures.data![index]),
+                      ));
+                },
+              ),
             );
           } else {
             return const Center(child: CircularProgressIndicator());
