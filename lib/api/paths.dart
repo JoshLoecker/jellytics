@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:jellytics/api/async_requests.dart';
 import 'package:jellytics/api/print.dart';
 import 'package:jellytics/utils/secure_storage.dart';
+import 'package:jellytics/data_classes/libraries.dart';
 import 'package:jellytics/views/library/query.dart';
 
 enum RequestType {
@@ -59,11 +60,12 @@ class GETPlugins extends _Plugins {
 class _System {
   static const String _basePath = "/System";
   static GET endpoint = GET("$_basePath/EndPoint");
-  static GET info = GET("$_basePath/Info");
-  static GET allLogs = GET("$_basePath/Logs");
-  static GET ping = GET("$_basePath/Ping");
-  static final GET log = GET("$allLogs/Log");
-  static final GET infoPublic = GET("$info/Public");
+  // Implement the following at some point
+  // static GET info = GET("$_basePath/Info");
+  // static GET allLogs = GET("$_basePath/Logs");
+  // static GET ping = GET("$_basePath/Ping");
+  // static final GET log = GET("$allLogs/Log");
+  // static final GET infoPublic = GET("$info/Public");
 }
 
 class GETSystem extends _System {
@@ -107,34 +109,55 @@ class GETSession extends _Session {
 }
 
 class GETImage {
-  static Future<String> getItemImageURL({required String id}) async {
+  static Future<String> itemImageURL({required String id}) async {
     SecureStorage storage = SecureStorage();
     await storage.isLoginSetup();
 
     return "${await storage.getServerURL()}/Items/$id/Images/Primary";
   }
+
+  static Future<List<dynamic>> getImageInfoPath({
+    required String id,
+  }) async {
+    SecureStorage storage = SecureStorage();
+    await storage.isLoginSetup();
+
+    CreateRequest request = await CreateRequest.construct();
+    final GET path = GET("${await storage.getServerURL()}/Items/$id/Images");
+
+    // List<Map<String, dynamic>>
+    return await request.get(path).then((value) => value.data);
+  }
 }
 
 class GETLibrary {
   final SecureStorage _storage = SecureStorage();
-  Response? _response;
 
-  Future<void> getLibraries() async {
+  Future<Map<String, dynamic>> getLibraries() async {
     CreateRequest request = await CreateRequest.construct();
     final GET getItems = GET("/Items");
 
-    _response = await request.get(getItems, queryParameters: {
-      "userId": await _storage.getUserID(),
-    });
-    prettyPrintJSON(_response?.data);
+    //Response response = await request.get(getItems, queryParameters: {
+    //  "userId": await _storage.getUserID(),
+    //});
+
+    // Return library JSON data
+    return await request.get(
+      getItems,
+      queryParameters: {
+        "userId": await _storage.getUserID(),
+      },
+    ).then((response) => response.data);
   }
 
-  Future<void> getItems({
+  Future<Map<String, dynamic>> getItems({
     required List<BaseItemKind> includeKind,
     required List<Field> fields,
     List<BaseItemKind> excludeKind = const <BaseItemKind>[],
     int limit = 1,
   }) async {
+    /// This function gets items based on an imput query
+
     CreateRequest request = await CreateRequest.construct();
 
     // Construct the query parameters
@@ -154,18 +177,35 @@ class GETLibrary {
     final GET items = GET(
       "/Users/${await _storage.getUserID()}/Items?IncludeItemTypes=$includeKindString&$excludeKindString&Recursive=True&startIndex=0&limit=$limit&Fields=$fieldString",
     );
-    Response response = await request.get(items);
-    prettyPrintJSON(response.data);
+
+    return await request.get(items).then((response) => response.data);
   }
 
-  Future<void> getUserMovies() async {
+  Future<Map<String, dynamic>> getByParentID({
+    required LibraryOverviewInfo parentInfo,
+  }) async {
+    CreateRequest request = await CreateRequest.construct();
+    final GET items = GET(
+        "/Users/${await _storage.getUserID()}/Items?parentId=${parentInfo.libraryData.id}&includeItemType=${parentInfo.libraryData.baseItemKind.name}");
+    return await request.get(items).then((response) => response.data);
+  }
+
+  Future<Map<String, dynamic>> getByID({
+    required LibraryDetailInfo itemInfo,
+  }) async {
+    CreateRequest request = await CreateRequest.construct();
+    final GET itemPath = GET(
+        "/Users/${await _storage.getUserID()}/Items/${itemInfo.libraryData.id}");
+
+    return await request.get(itemPath).then((response) => response.data);
+  }
+
+  Future<Map<String, dynamic>> getUserMovies() async {
     CreateRequest request = await CreateRequest.construct();
     final GET userMovies = GET(
       "/Users/${await _storage.getUserID()}/Items?IncludeItemTypes=movie&Recursive=True&startIndex=0&limit=1&Fields=MediaStreams,Path",
     );
 
-    // Response realResponse = await request.get(userMovies);
-    _response = await request.get(userMovies);
-    prettyPrintJSON(await _response?.data);
+    return await request.get(userMovies).then((response) => response.data);
   }
 }

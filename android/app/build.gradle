@@ -25,8 +25,17 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
+// Code Signing
+// from: https://docs.flutter.dev/deployment/android
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+
 android {
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdk 33
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -47,19 +56,36 @@ android {
         applicationId "org.duckdns.joshl.jellytics"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
+        minSdkVersion 18
+        targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        manifestPlaceholders = [applicationName: "android.app.Application"]
+    }
+
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+           storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+            storePassword keystoreProperties['storePassword']
+        }
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
+            manifestPlaceholders = [applicationName: "android.app.Application"]
+        }
+        debug {
+            manifestPlaceholders = [applicationName: "android.app.Application"]
+        }
+        build {
+            manifestPlaceholders = [applicationName: "android.app.Application"]
         }
     }
+    namespace 'org.duckdns.joshl.jellytics'
+    buildToolsVersion '33.0.0'
 }
 
 flutter {
@@ -68,4 +94,5 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
 }
