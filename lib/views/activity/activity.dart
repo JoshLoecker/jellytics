@@ -3,6 +3,7 @@ import 'package:jellytics/data_classes/active_streams.dart';
 import 'package:jellytics/views/activity/get_activity.dart';
 import 'package:jellytics/utils/secure_storage.dart';
 import 'package:jellytics/utils/screens.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class _ActivityWidget extends StatefulWidget {
   const _ActivityWidget();
@@ -44,7 +45,15 @@ class _ActivityState extends State<_ActivityWidget> {
           // Image artwork
           Container(
             alignment: Alignment.center,
-            child: Image.network(streamData.imagePath),
+            width: 75,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(7),
+              child: FadeInImage(
+                placeholder: MemoryImage(kTransparentImage),
+                image: NetworkImage(streamData.imagePath),
+                fadeInDuration: const Duration(milliseconds: 200),
+              ),
+            ),
           ),
           // Text information (playing title, year, user)
           Expanded(

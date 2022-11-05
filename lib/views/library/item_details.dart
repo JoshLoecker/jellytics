@@ -25,7 +25,7 @@ class LibraryItemDetails extends StatefulWidget {
 class _LibraryItemDetailsState extends State<LibraryItemDetails> {
   Widget rowDetails(String header, String? value) {
     if (value == null) {
-      widget.missingValues.add(header);
+      widget.missingValues.add(header.replaceAll(":", ""));
       widget.noData = true;
       return const SizedBox.shrink();
     } else {
@@ -51,6 +51,10 @@ class _LibraryItemDetailsState extends State<LibraryItemDetails> {
 
   Widget itemDetails(ItemDetailInfo itemInfo) {
     return ListView(
+      // These lines are required to limit the vertical viewport of the ListView
+      // From:https://stackoverflow.com/questions/50252569
+      // scrollDirection: Axis.vertical,
+      // shrinkWrap: true,
       children: <Widget>[
         FadeInImage(
           placeholder: MemoryImage(kTransparentImage),
@@ -88,26 +92,7 @@ class _LibraryItemDetailsState extends State<LibraryItemDetails> {
         future: getLibraryItemDetails(widget.itemInfo, widget.secureStorage),
         builder: (context, AsyncSnapshot<ItemDetailInfo> futures) {
           if (futures.hasData) {
-            return Container(
-              alignment: Alignment.center,
-              child: Column(
-                children: <Widget>[
-                  itemDetails(futures.data!),
-                  //if (widget.noData)
-                  widget.noData
-                      ? Container(
-                          padding: const EdgeInsets.all(10),
-                          child: Text(
-                            "Missing data: ${widget.missingValues.join(", ")}\nAdd it in the jellyfin web interface",
-                            style: const TextStyle(
-                              color: Colors.red,
-                            ),
-                          ),
-                        )
-                      : const Text(""),
-                ],
-              ),
-            );
+            return itemDetails(futures.data!);
           } else {
             return const Center(child: CircularProgressIndicator());
           }

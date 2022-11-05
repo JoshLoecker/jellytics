@@ -28,6 +28,8 @@ dependencies:
   fl_chart: ^0.55.1                # charts & graphs
   flutter_launcher_icons: ^0.10.0  # Launch icons
   flutter_native_splash: ^2.2.9    # Loadup splash screen
+  riverpod_annotation: ^1.0.4      # State management (riverpod)
+  flutter_riverpod: ^2.1.1         # State management
   flutter_secure_storage: ^6.0.0   # For secure storage
   freezed_annotation: ^2.2.0       # For data classes (freezed)
   transparent_image: ^2.0.0        # Transparent images
@@ -42,6 +44,7 @@ dev_dependencies:
   flutter_lints: ^2.0.0            # See the `analysis_options.yaml` file for more information
   freezed: ^2.2.1                  # For data classes (freezed)
   build_runner: ^2.3.2             # For data classes (freezed)
+  riverpod_generator: ^1.0.4       # State management (riverpod)
 
 flutter:
   uses-material-design: true

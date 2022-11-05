@@ -83,24 +83,27 @@ Future<ItemDetailInfo> getLibraryItemDetails(
   int backdropImageIndex = imagePathInfo.indexWhere(
       (element) => element["ImageType"].toLowerCase() == "backdrop");
 
+  String release = await idData["ProductionYear"].toString();
+
   ItemDetailInfo data = ItemDetailInfo(
     libraryData: LibrarySuper(
       name: itemInfo.libraryData.name,
       id: itemInfo.libraryData.id,
       baseItemKind: itemInfo.libraryData.baseItemKind,
     ),
+    imageInfo: imagePathInfo,
     imagePath: await GETImage.itemImageURL(id: itemInfo.libraryData.id),
+    imdb: await idData["ProviderIds"]["Imdb"],
+    overview: await idData["Overview"],
+    releaseYear: release == "null" ? null : release,
+    tmdbId: await idData["ProviderIds"]["Tmdb"],
     backdropImagePath: backdropImageIndex != -1
         ? "${await secureStorage.getServerURL()}/Items/${itemInfo.libraryData.id}/Images/Backdrop"
         : "",
-    imageInfo: imagePathInfo,
-    overview: await idData["Overview"],
     genre: idData["Genres"].toString() == "[]" // empty list. How to compare?
         ? null
         : idData["Genres"].join(", "),
-    releaseYear: await idData["ProductionYear"],
-    tmdbId: await idData["ProviderIds"]["Tmdb"],
-    imdb: await idData["ProviderIds"]["Imdb"],
   );
+
   return data;
 }
