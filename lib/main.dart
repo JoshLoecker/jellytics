@@ -62,18 +62,15 @@ class _StatefulApp extends ConsumerState<StatefulApp> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_appBarTitle),
-        elevation: 0,
       ),
       body: Center(
         child: _screenWidgets.elementAt(_currentNavIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
         elevation: 0, // no drop shadow
-        unselectedItemColor: Colors.grey[600],
-        showUnselectedLabels: true,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.tv_outlined),
+            icon: Icon(Icons.tv_sharp),
             label: "Activity",
           ),
           BottomNavigationBarItem(
@@ -81,11 +78,7 @@ class _StatefulApp extends ConsumerState<StatefulApp> {
             label: "Library",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.analytics_outlined),
-            label: "Statistics",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings_outlined),
+            icon: Icon(Icons.settings),
             label: "Settings",
           ),
         ],
@@ -95,6 +88,14 @@ class _StatefulApp extends ConsumerState<StatefulApp> {
       ),
     );
   }
+
+  // This is a list of items that are being provided as the "content" widgets.
+  // Modifying content of these files will impact the view on the appropriate screen widget
+  static const List<Widget> _screenWidgets = <Widget>[
+    views.activityContent,
+    views.libraryContent,
+    views.settingsContent,
+  ];
 
   // When tapping on the BottomNavBar, switch to the appropriate index
   void _onNavBarTapped(int index) {
