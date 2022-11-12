@@ -13,7 +13,7 @@ class _LibraryOverview extends StatefulWidget {
 
 class _LibraryOverviewState extends State<_LibraryOverview> {
   Widget libraryCard({
-    required LibraryOverviewInfo libraryData,
+    required ItemDetailInfoNew libraryData,
     double maxCardHeight = 125,
   }) {
     Widget child = InkWell(
@@ -28,7 +28,7 @@ class _LibraryOverviewState extends State<_LibraryOverview> {
         context: context,
         containerChild: Container(
           alignment: Alignment.center,
-          child: Text(libraryData.libraryData.name),
+          child: Text(libraryData.name),
         ),
       ),
     );
@@ -48,7 +48,7 @@ class _LibraryOverviewState extends State<_LibraryOverview> {
     return Scrollbar(
       child: FutureBuilder(
         future: getUserLibraries(),
-        builder: (context, AsyncSnapshot<List<LibraryOverviewInfo>> futures) {
+        builder: (context, AsyncSnapshot<List<ItemDetailInfoNew>> futures) {
           if (futures.hasData) {
             return ListView.builder(
               itemCount: futures.data?.length,
@@ -59,7 +59,6 @@ class _LibraryOverviewState extends State<_LibraryOverview> {
               },
             );
           } else {
-            Future.delayed(const Duration(seconds: 1));
             return const Center(child: CircularProgressIndicator());
           }
         },

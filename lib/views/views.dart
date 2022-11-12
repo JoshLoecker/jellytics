@@ -8,3 +8,4 @@ library views;
 export 'package:jellytics/views/activity/activity.dart';
 export 'package:jellytics/views/library/library_overview.dart';
 export 'package:jellytics/views/settings.dart';
+export 'package:jellytics/views/statistics/statistics.dart';

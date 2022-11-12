@@ -15,29 +15,48 @@ final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
-mixin _$LibrarySuper {
+mixin _$ItemDetailInfoNew {
   String get name => throw _privateConstructorUsedError;
   String get id => throw _privateConstructorUsedError;
   BaseItemKind get baseItemKind => throw _privateConstructorUsedError;
+  String? get posterImagePath => throw _privateConstructorUsedError;
+  String? get backdropImagePath => throw _privateConstructorUsedError;
+  List<dynamic>? get imageInfo => throw _privateConstructorUsedError;
+  String? get overview => throw _privateConstructorUsedError;
+  String? get genre => throw _privateConstructorUsedError;
+  String? get releaseYear => throw _privateConstructorUsedError;
+  String? get tmdbID => throw _privateConstructorUsedError;
+  String? get imdbID => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
-  $LibrarySuperCopyWith<LibrarySuper> get copyWith =>
+  $ItemDetailInfoNewCopyWith<ItemDetailInfoNew> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $LibrarySuperCopyWith<$Res> {
-  factory $LibrarySuperCopyWith(
-          LibrarySuper value, $Res Function(LibrarySuper) then) =
-      _$LibrarySuperCopyWithImpl<$Res, LibrarySuper>;
+abstract class $ItemDetailInfoNewCopyWith<$Res> {
+  factory $ItemDetailInfoNewCopyWith(
+          ItemDetailInfoNew value, $Res Function(ItemDetailInfoNew) then) =
+      _$ItemDetailInfoNewCopyWithImpl<$Res, ItemDetailInfoNew>;
   @useResult
-  $Res call({String name, String id, BaseItemKind baseItemKind});
+  $Res call(
+      {String name,
+      String id,
+      BaseItemKind baseItemKind,
+      String? posterImagePath,
+      String? backdropImagePath,
+      List<dynamic>? imageInfo,
+      String? overview,
+      String? genre,
+      String? releaseYear,
+      String? tmdbID,
+      String? imdbID});
 }
 
 /// @nodoc
-class _$LibrarySuperCopyWithImpl<$Res, $Val extends LibrarySuper>
-    implements $LibrarySuperCopyWith<$Res> {
-  _$LibrarySuperCopyWithImpl(this._value, this._then);
+class _$ItemDetailInfoNewCopyWithImpl<$Res, $Val extends ItemDetailInfoNew>
+    implements $ItemDetailInfoNewCopyWith<$Res> {
+  _$ItemDetailInfoNewCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
@@ -50,6 +69,14 @@ class _$LibrarySuperCopyWithImpl<$Res, $Val extends LibrarySuper>
     Object? name = null,
     Object? id = null,
     Object? baseItemKind = null,
+    Object? posterImagePath = freezed,
+    Object? backdropImagePath = freezed,
+    Object? imageInfo = freezed,
+    Object? overview = freezed,
+    Object? genre = freezed,
+    Object? releaseYear = freezed,
+    Object? tmdbID = freezed,
+    Object? imdbID = freezed,
   }) {
     return _then(_value.copyWith(
       name: null == name
@@ -64,27 +91,70 @@ class _$LibrarySuperCopyWithImpl<$Res, $Val extends LibrarySuper>
           ? _value.baseItemKind
           : baseItemKind // ignore: cast_nullable_to_non_nullable
               as BaseItemKind,
+      posterImagePath: freezed == posterImagePath
+          ? _value.posterImagePath
+          : posterImagePath // ignore: cast_nullable_to_non_nullable
+              as String?,
+      backdropImagePath: freezed == backdropImagePath
+          ? _value.backdropImagePath
+          : backdropImagePath // ignore: cast_nullable_to_non_nullable
+              as String?,
+      imageInfo: freezed == imageInfo
+          ? _value.imageInfo
+          : imageInfo // ignore: cast_nullable_to_non_nullable
+              as List<dynamic>?,
+      overview: freezed == overview
+          ? _value.overview
+          : overview // ignore: cast_nullable_to_non_nullable
+              as String?,
+      genre: freezed == genre
+          ? _value.genre
+          : genre // ignore: cast_nullable_to_non_nullable
+              as String?,
+      releaseYear: freezed == releaseYear
+          ? _value.releaseYear
+          : releaseYear // ignore: cast_nullable_to_non_nullable
+              as String?,
+      tmdbID: freezed == tmdbID
+          ? _value.tmdbID
+          : tmdbID // ignore: cast_nullable_to_non_nullable
+              as String?,
+      imdbID: freezed == imdbID
+          ? _value.imdbID
+          : imdbID // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$$_LibrarySuperCopyWith<$Res>
-    implements $LibrarySuperCopyWith<$Res> {
-  factory _$$_LibrarySuperCopyWith(
-          _$_LibrarySuper value, $Res Function(_$_LibrarySuper) then) =
-      __$$_LibrarySuperCopyWithImpl<$Res>;
+abstract class _$$_ItemDetailInfoNewCopyWith<$Res>
+    implements $ItemDetailInfoNewCopyWith<$Res> {
+  factory _$$_ItemDetailInfoNewCopyWith(_$_ItemDetailInfoNew value,
+          $Res Function(_$_ItemDetailInfoNew) then) =
+      __$$_ItemDetailInfoNewCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String name, String id, BaseItemKind baseItemKind});
+  $Res call(
+      {String name,
+      String id,
+      BaseItemKind baseItemKind,
+      String? posterImagePath,
+      String? backdropImagePath,
+      List<dynamic>? imageInfo,
+      String? overview,
+      String? genre,
+      String? releaseYear,
+      String? tmdbID,
+      String? imdbID});
 }
 
 /// @nodoc
-class __$$_LibrarySuperCopyWithImpl<$Res>
-    extends _$LibrarySuperCopyWithImpl<$Res, _$_LibrarySuper>
-    implements _$$_LibrarySuperCopyWith<$Res> {
-  __$$_LibrarySuperCopyWithImpl(
-      _$_LibrarySuper _value, $Res Function(_$_LibrarySuper) _then)
+class __$$_ItemDetailInfoNewCopyWithImpl<$Res>
+    extends _$ItemDetailInfoNewCopyWithImpl<$Res, _$_ItemDetailInfoNew>
+    implements _$$_ItemDetailInfoNewCopyWith<$Res> {
+  __$$_ItemDetailInfoNewCopyWithImpl(
+      _$_ItemDetailInfoNew _value, $Res Function(_$_ItemDetailInfoNew) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -93,8 +163,16 @@ class __$$_LibrarySuperCopyWithImpl<$Res>
     Object? name = null,
     Object? id = null,
     Object? baseItemKind = null,
+    Object? posterImagePath = freezed,
+    Object? backdropImagePath = freezed,
+    Object? imageInfo = freezed,
+    Object? overview = freezed,
+    Object? genre = freezed,
+    Object? releaseYear = freezed,
+    Object? tmdbID = freezed,
+    Object? imdbID = freezed,
   }) {
-    return _then(_$_LibrarySuper(
+    return _then(_$_ItemDetailInfoNew(
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -107,15 +185,60 @@ class __$$_LibrarySuperCopyWithImpl<$Res>
           ? _value.baseItemKind
           : baseItemKind // ignore: cast_nullable_to_non_nullable
               as BaseItemKind,
+      posterImagePath: freezed == posterImagePath
+          ? _value.posterImagePath
+          : posterImagePath // ignore: cast_nullable_to_non_nullable
+              as String?,
+      backdropImagePath: freezed == backdropImagePath
+          ? _value.backdropImagePath
+          : backdropImagePath // ignore: cast_nullable_to_non_nullable
+              as String?,
+      imageInfo: freezed == imageInfo
+          ? _value._imageInfo
+          : imageInfo // ignore: cast_nullable_to_non_nullable
+              as List<dynamic>?,
+      overview: freezed == overview
+          ? _value.overview
+          : overview // ignore: cast_nullable_to_non_nullable
+              as String?,
+      genre: freezed == genre
+          ? _value.genre
+          : genre // ignore: cast_nullable_to_non_nullable
+              as String?,
+      releaseYear: freezed == releaseYear
+          ? _value.releaseYear
+          : releaseYear // ignore: cast_nullable_to_non_nullable
+              as String?,
+      tmdbID: freezed == tmdbID
+          ? _value.tmdbID
+          : tmdbID // ignore: cast_nullable_to_non_nullable
+              as String?,
+      imdbID: freezed == imdbID
+          ? _value.imdbID
+          : imdbID // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
 
 /// @nodoc
 
-class _$_LibrarySuper with DiagnosticableTreeMixin implements _LibrarySuper {
-  const _$_LibrarySuper(
-      {required this.name, required this.id, required this.baseItemKind});
+class _$_ItemDetailInfoNew
+    with DiagnosticableTreeMixin
+    implements _ItemDetailInfoNew {
+  const _$_ItemDetailInfoNew(
+      {required this.name,
+      required this.id,
+      required this.baseItemKind,
+      this.posterImagePath,
+      this.backdropImagePath,
+      final List<dynamic>? imageInfo,
+      this.overview,
+      this.genre,
+      this.releaseYear,
+      this.tmdbID,
+      this.imdbID})
+      : _imageInfo = imageInfo;
 
   @override
   final String name;
@@ -123,571 +246,17 @@ class _$_LibrarySuper with DiagnosticableTreeMixin implements _LibrarySuper {
   final String id;
   @override
   final BaseItemKind baseItemKind;
-
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'LibrarySuper(name: $name, id: $id, baseItemKind: $baseItemKind)';
-  }
-
+  final String? posterImagePath;
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'LibrarySuper'))
-      ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('id', id))
-      ..add(DiagnosticsProperty('baseItemKind', baseItemKind));
-  }
-
+  final String? backdropImagePath;
+  final List<dynamic>? _imageInfo;
   @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$_LibrarySuper &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.baseItemKind, baseItemKind) ||
-                other.baseItemKind == baseItemKind));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, name, id, baseItemKind);
-
-  @JsonKey(ignore: true)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$_LibrarySuperCopyWith<_$_LibrarySuper> get copyWith =>
-      __$$_LibrarySuperCopyWithImpl<_$_LibrarySuper>(this, _$identity);
-}
-
-abstract class _LibrarySuper implements LibrarySuper {
-  const factory _LibrarySuper(
-      {required final String name,
-      required final String id,
-      required final BaseItemKind baseItemKind}) = _$_LibrarySuper;
-
-  @override
-  String get name;
-  @override
-  String get id;
-  @override
-  BaseItemKind get baseItemKind;
-  @override
-  @JsonKey(ignore: true)
-  _$$_LibrarySuperCopyWith<_$_LibrarySuper> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-mixin _$LibraryOverviewInfo {
-  LibrarySuper get libraryData => throw _privateConstructorUsedError;
-
-  @JsonKey(ignore: true)
-  $LibraryOverviewInfoCopyWith<LibraryOverviewInfo> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $LibraryOverviewInfoCopyWith<$Res> {
-  factory $LibraryOverviewInfoCopyWith(
-          LibraryOverviewInfo value, $Res Function(LibraryOverviewInfo) then) =
-      _$LibraryOverviewInfoCopyWithImpl<$Res, LibraryOverviewInfo>;
-  @useResult
-  $Res call({LibrarySuper libraryData});
-
-  $LibrarySuperCopyWith<$Res> get libraryData;
-}
-
-/// @nodoc
-class _$LibraryOverviewInfoCopyWithImpl<$Res, $Val extends LibraryOverviewInfo>
-    implements $LibraryOverviewInfoCopyWith<$Res> {
-  _$LibraryOverviewInfoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? libraryData = null,
-  }) {
-    return _then(_value.copyWith(
-      libraryData: null == libraryData
-          ? _value.libraryData
-          : libraryData // ignore: cast_nullable_to_non_nullable
-              as LibrarySuper,
-    ) as $Val);
-  }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $LibrarySuperCopyWith<$Res> get libraryData {
-    return $LibrarySuperCopyWith<$Res>(_value.libraryData, (value) {
-      return _then(_value.copyWith(libraryData: value) as $Val);
-    });
-  }
-}
-
-/// @nodoc
-abstract class _$$_LibraryOverviewInfoCopyWith<$Res>
-    implements $LibraryOverviewInfoCopyWith<$Res> {
-  factory _$$_LibraryOverviewInfoCopyWith(_$_LibraryOverviewInfo value,
-          $Res Function(_$_LibraryOverviewInfo) then) =
-      __$$_LibraryOverviewInfoCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({LibrarySuper libraryData});
-
-  @override
-  $LibrarySuperCopyWith<$Res> get libraryData;
-}
-
-/// @nodoc
-class __$$_LibraryOverviewInfoCopyWithImpl<$Res>
-    extends _$LibraryOverviewInfoCopyWithImpl<$Res, _$_LibraryOverviewInfo>
-    implements _$$_LibraryOverviewInfoCopyWith<$Res> {
-  __$$_LibraryOverviewInfoCopyWithImpl(_$_LibraryOverviewInfo _value,
-      $Res Function(_$_LibraryOverviewInfo) _then)
-      : super(_value, _then);
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? libraryData = null,
-  }) {
-    return _then(_$_LibraryOverviewInfo(
-      libraryData: null == libraryData
-          ? _value.libraryData
-          : libraryData // ignore: cast_nullable_to_non_nullable
-              as LibrarySuper,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$_LibraryOverviewInfo
-    with DiagnosticableTreeMixin
-    implements _LibraryOverviewInfo {
-  const _$_LibraryOverviewInfo({required this.libraryData});
-
-  @override
-  final LibrarySuper libraryData;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'LibraryOverviewInfo(libraryData: $libraryData)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'LibraryOverviewInfo'))
-      ..add(DiagnosticsProperty('libraryData', libraryData));
-  }
-
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$_LibraryOverviewInfo &&
-            (identical(other.libraryData, libraryData) ||
-                other.libraryData == libraryData));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, libraryData);
-
-  @JsonKey(ignore: true)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$_LibraryOverviewInfoCopyWith<_$_LibraryOverviewInfo> get copyWith =>
-      __$$_LibraryOverviewInfoCopyWithImpl<_$_LibraryOverviewInfo>(
-          this, _$identity);
-}
-
-abstract class _LibraryOverviewInfo implements LibraryOverviewInfo {
-  const factory _LibraryOverviewInfo(
-      {required final LibrarySuper libraryData}) = _$_LibraryOverviewInfo;
-
-  @override
-  LibrarySuper get libraryData;
-  @override
-  @JsonKey(ignore: true)
-  _$$_LibraryOverviewInfoCopyWith<_$_LibraryOverviewInfo> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-mixin _$LibraryDetailInfo {
-  LibrarySuper get libraryData => throw _privateConstructorUsedError;
-
-  @JsonKey(ignore: true)
-  $LibraryDetailInfoCopyWith<LibraryDetailInfo> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $LibraryDetailInfoCopyWith<$Res> {
-  factory $LibraryDetailInfoCopyWith(
-          LibraryDetailInfo value, $Res Function(LibraryDetailInfo) then) =
-      _$LibraryDetailInfoCopyWithImpl<$Res, LibraryDetailInfo>;
-  @useResult
-  $Res call({LibrarySuper libraryData});
-
-  $LibrarySuperCopyWith<$Res> get libraryData;
-}
-
-/// @nodoc
-class _$LibraryDetailInfoCopyWithImpl<$Res, $Val extends LibraryDetailInfo>
-    implements $LibraryDetailInfoCopyWith<$Res> {
-  _$LibraryDetailInfoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? libraryData = null,
-  }) {
-    return _then(_value.copyWith(
-      libraryData: null == libraryData
-          ? _value.libraryData
-          : libraryData // ignore: cast_nullable_to_non_nullable
-              as LibrarySuper,
-    ) as $Val);
-  }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $LibrarySuperCopyWith<$Res> get libraryData {
-    return $LibrarySuperCopyWith<$Res>(_value.libraryData, (value) {
-      return _then(_value.copyWith(libraryData: value) as $Val);
-    });
-  }
-}
-
-/// @nodoc
-abstract class _$$_LibraryDetailInfoCopyWith<$Res>
-    implements $LibraryDetailInfoCopyWith<$Res> {
-  factory _$$_LibraryDetailInfoCopyWith(_$_LibraryDetailInfo value,
-          $Res Function(_$_LibraryDetailInfo) then) =
-      __$$_LibraryDetailInfoCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({LibrarySuper libraryData});
-
-  @override
-  $LibrarySuperCopyWith<$Res> get libraryData;
-}
-
-/// @nodoc
-class __$$_LibraryDetailInfoCopyWithImpl<$Res>
-    extends _$LibraryDetailInfoCopyWithImpl<$Res, _$_LibraryDetailInfo>
-    implements _$$_LibraryDetailInfoCopyWith<$Res> {
-  __$$_LibraryDetailInfoCopyWithImpl(
-      _$_LibraryDetailInfo _value, $Res Function(_$_LibraryDetailInfo) _then)
-      : super(_value, _then);
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? libraryData = null,
-  }) {
-    return _then(_$_LibraryDetailInfo(
-      libraryData: null == libraryData
-          ? _value.libraryData
-          : libraryData // ignore: cast_nullable_to_non_nullable
-              as LibrarySuper,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$_LibraryDetailInfo
-    with DiagnosticableTreeMixin
-    implements _LibraryDetailInfo {
-  const _$_LibraryDetailInfo({required this.libraryData});
-
-  @override
-  final LibrarySuper libraryData;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'LibraryDetailInfo(libraryData: $libraryData)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'LibraryDetailInfo'))
-      ..add(DiagnosticsProperty('libraryData', libraryData));
-  }
-
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$_LibraryDetailInfo &&
-            (identical(other.libraryData, libraryData) ||
-                other.libraryData == libraryData));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, libraryData);
-
-  @JsonKey(ignore: true)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$_LibraryDetailInfoCopyWith<_$_LibraryDetailInfo> get copyWith =>
-      __$$_LibraryDetailInfoCopyWithImpl<_$_LibraryDetailInfo>(
-          this, _$identity);
-}
-
-abstract class _LibraryDetailInfo implements LibraryDetailInfo {
-  const factory _LibraryDetailInfo({required final LibrarySuper libraryData}) =
-      _$_LibraryDetailInfo;
-
-  @override
-  LibrarySuper get libraryData;
-  @override
-  @JsonKey(ignore: true)
-  _$$_LibraryDetailInfoCopyWith<_$_LibraryDetailInfo> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-mixin _$ItemDetailInfo {
-  LibrarySuper get libraryData => throw _privateConstructorUsedError;
-  String get imagePath => throw _privateConstructorUsedError;
-  String get backdropImagePath => throw _privateConstructorUsedError;
-  List<dynamic> get imageInfo => throw _privateConstructorUsedError;
-  String? get overview => throw _privateConstructorUsedError;
-  String? get genre => throw _privateConstructorUsedError;
-  String? get releaseYear =>
-      throw _privateConstructorUsedError; // ProductionYear
-  String? get tmdbId =>
-      throw _privateConstructorUsedError; //ProviderIds["Tmdb"]
-  String? get imdb => throw _privateConstructorUsedError;
-
-  @JsonKey(ignore: true)
-  $ItemDetailInfoCopyWith<ItemDetailInfo> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $ItemDetailInfoCopyWith<$Res> {
-  factory $ItemDetailInfoCopyWith(
-          ItemDetailInfo value, $Res Function(ItemDetailInfo) then) =
-      _$ItemDetailInfoCopyWithImpl<$Res, ItemDetailInfo>;
-  @useResult
-  $Res call(
-      {LibrarySuper libraryData,
-      String imagePath,
-      String backdropImagePath,
-      List<dynamic> imageInfo,
-      String? overview,
-      String? genre,
-      String? releaseYear,
-      String? tmdbId,
-      String? imdb});
-
-  $LibrarySuperCopyWith<$Res> get libraryData;
-}
-
-/// @nodoc
-class _$ItemDetailInfoCopyWithImpl<$Res, $Val extends ItemDetailInfo>
-    implements $ItemDetailInfoCopyWith<$Res> {
-  _$ItemDetailInfoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? libraryData = null,
-    Object? imagePath = null,
-    Object? backdropImagePath = null,
-    Object? imageInfo = null,
-    Object? overview = freezed,
-    Object? genre = freezed,
-    Object? releaseYear = freezed,
-    Object? tmdbId = freezed,
-    Object? imdb = freezed,
-  }) {
-    return _then(_value.copyWith(
-      libraryData: null == libraryData
-          ? _value.libraryData
-          : libraryData // ignore: cast_nullable_to_non_nullable
-              as LibrarySuper,
-      imagePath: null == imagePath
-          ? _value.imagePath
-          : imagePath // ignore: cast_nullable_to_non_nullable
-              as String,
-      backdropImagePath: null == backdropImagePath
-          ? _value.backdropImagePath
-          : backdropImagePath // ignore: cast_nullable_to_non_nullable
-              as String,
-      imageInfo: null == imageInfo
-          ? _value.imageInfo
-          : imageInfo // ignore: cast_nullable_to_non_nullable
-              as List<dynamic>,
-      overview: freezed == overview
-          ? _value.overview
-          : overview // ignore: cast_nullable_to_non_nullable
-              as String?,
-      genre: freezed == genre
-          ? _value.genre
-          : genre // ignore: cast_nullable_to_non_nullable
-              as String?,
-      releaseYear: freezed == releaseYear
-          ? _value.releaseYear
-          : releaseYear // ignore: cast_nullable_to_non_nullable
-              as String?,
-      tmdbId: freezed == tmdbId
-          ? _value.tmdbId
-          : tmdbId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      imdb: freezed == imdb
-          ? _value.imdb
-          : imdb // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
-  }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $LibrarySuperCopyWith<$Res> get libraryData {
-    return $LibrarySuperCopyWith<$Res>(_value.libraryData, (value) {
-      return _then(_value.copyWith(libraryData: value) as $Val);
-    });
-  }
-}
-
-/// @nodoc
-abstract class _$$_ItemDetailInfoCopyWith<$Res>
-    implements $ItemDetailInfoCopyWith<$Res> {
-  factory _$$_ItemDetailInfoCopyWith(
-          _$_ItemDetailInfo value, $Res Function(_$_ItemDetailInfo) then) =
-      __$$_ItemDetailInfoCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {LibrarySuper libraryData,
-      String imagePath,
-      String backdropImagePath,
-      List<dynamic> imageInfo,
-      String? overview,
-      String? genre,
-      String? releaseYear,
-      String? tmdbId,
-      String? imdb});
-
-  @override
-  $LibrarySuperCopyWith<$Res> get libraryData;
-}
-
-/// @nodoc
-class __$$_ItemDetailInfoCopyWithImpl<$Res>
-    extends _$ItemDetailInfoCopyWithImpl<$Res, _$_ItemDetailInfo>
-    implements _$$_ItemDetailInfoCopyWith<$Res> {
-  __$$_ItemDetailInfoCopyWithImpl(
-      _$_ItemDetailInfo _value, $Res Function(_$_ItemDetailInfo) _then)
-      : super(_value, _then);
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? libraryData = null,
-    Object? imagePath = null,
-    Object? backdropImagePath = null,
-    Object? imageInfo = null,
-    Object? overview = freezed,
-    Object? genre = freezed,
-    Object? releaseYear = freezed,
-    Object? tmdbId = freezed,
-    Object? imdb = freezed,
-  }) {
-    return _then(_$_ItemDetailInfo(
-      libraryData: null == libraryData
-          ? _value.libraryData
-          : libraryData // ignore: cast_nullable_to_non_nullable
-              as LibrarySuper,
-      imagePath: null == imagePath
-          ? _value.imagePath
-          : imagePath // ignore: cast_nullable_to_non_nullable
-              as String,
-      backdropImagePath: null == backdropImagePath
-          ? _value.backdropImagePath
-          : backdropImagePath // ignore: cast_nullable_to_non_nullable
-              as String,
-      imageInfo: null == imageInfo
-          ? _value._imageInfo
-          : imageInfo // ignore: cast_nullable_to_non_nullable
-              as List<dynamic>,
-      overview: freezed == overview
-          ? _value.overview
-          : overview // ignore: cast_nullable_to_non_nullable
-              as String?,
-      genre: freezed == genre
-          ? _value.genre
-          : genre // ignore: cast_nullable_to_non_nullable
-              as String?,
-      releaseYear: freezed == releaseYear
-          ? _value.releaseYear
-          : releaseYear // ignore: cast_nullable_to_non_nullable
-              as String?,
-      tmdbId: freezed == tmdbId
-          ? _value.tmdbId
-          : tmdbId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      imdb: freezed == imdb
-          ? _value.imdb
-          : imdb // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$_ItemDetailInfo
-    with DiagnosticableTreeMixin
-    implements _ItemDetailInfo {
-  const _$_ItemDetailInfo(
-      {required this.libraryData,
-      required this.imagePath,
-      required this.backdropImagePath,
-      required final List<dynamic> imageInfo,
-      required this.overview,
-      required this.genre,
-      required this.releaseYear,
-      required this.tmdbId,
-      required this.imdb})
-      : _imageInfo = imageInfo;
-
-  @override
-  final LibrarySuper libraryData;
-  @override
-  final String imagePath;
-  @override
-  final String backdropImagePath;
-  final List<dynamic> _imageInfo;
-  @override
-  List<dynamic> get imageInfo {
+  List<dynamic>? get imageInfo {
+    final value = _imageInfo;
+    if (value == null) return null;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_imageInfo);
+    return EqualUnmodifiableListView(value);
   }
 
   @override
@@ -696,43 +265,45 @@ class _$_ItemDetailInfo
   final String? genre;
   @override
   final String? releaseYear;
-// ProductionYear
   @override
-  final String? tmdbId;
-//ProviderIds["Tmdb"]
+  final String? tmdbID;
   @override
-  final String? imdb;
+  final String? imdbID;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ItemDetailInfo(libraryData: $libraryData, imagePath: $imagePath, backdropImagePath: $backdropImagePath, imageInfo: $imageInfo, overview: $overview, genre: $genre, releaseYear: $releaseYear, tmdbId: $tmdbId, imdb: $imdb)';
+    return 'ItemDetailInfoNew(name: $name, id: $id, baseItemKind: $baseItemKind, posterImagePath: $posterImagePath, backdropImagePath: $backdropImagePath, imageInfo: $imageInfo, overview: $overview, genre: $genre, releaseYear: $releaseYear, tmdbID: $tmdbID, imdbID: $imdbID)';
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(DiagnosticsProperty('type', 'ItemDetailInfo'))
-      ..add(DiagnosticsProperty('libraryData', libraryData))
-      ..add(DiagnosticsProperty('imagePath', imagePath))
+      ..add(DiagnosticsProperty('type', 'ItemDetailInfoNew'))
+      ..add(DiagnosticsProperty('name', name))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('baseItemKind', baseItemKind))
+      ..add(DiagnosticsProperty('posterImagePath', posterImagePath))
       ..add(DiagnosticsProperty('backdropImagePath', backdropImagePath))
       ..add(DiagnosticsProperty('imageInfo', imageInfo))
       ..add(DiagnosticsProperty('overview', overview))
       ..add(DiagnosticsProperty('genre', genre))
       ..add(DiagnosticsProperty('releaseYear', releaseYear))
-      ..add(DiagnosticsProperty('tmdbId', tmdbId))
-      ..add(DiagnosticsProperty('imdb', imdb));
+      ..add(DiagnosticsProperty('tmdbID', tmdbID))
+      ..add(DiagnosticsProperty('imdbID', imdbID));
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_ItemDetailInfo &&
-            (identical(other.libraryData, libraryData) ||
-                other.libraryData == libraryData) &&
-            (identical(other.imagePath, imagePath) ||
-                other.imagePath == imagePath) &&
+            other is _$_ItemDetailInfoNew &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.baseItemKind, baseItemKind) ||
+                other.baseItemKind == baseItemKind) &&
+            (identical(other.posterImagePath, posterImagePath) ||
+                other.posterImagePath == posterImagePath) &&
             (identical(other.backdropImagePath, backdropImagePath) ||
                 other.backdropImagePath == backdropImagePath) &&
             const DeepCollectionEquality()
@@ -742,62 +313,71 @@ class _$_ItemDetailInfo
             (identical(other.genre, genre) || other.genre == genre) &&
             (identical(other.releaseYear, releaseYear) ||
                 other.releaseYear == releaseYear) &&
-            (identical(other.tmdbId, tmdbId) || other.tmdbId == tmdbId) &&
-            (identical(other.imdb, imdb) || other.imdb == imdb));
+            (identical(other.tmdbID, tmdbID) || other.tmdbID == tmdbID) &&
+            (identical(other.imdbID, imdbID) || other.imdbID == imdbID));
   }
 
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      libraryData,
-      imagePath,
+      name,
+      id,
+      baseItemKind,
+      posterImagePath,
       backdropImagePath,
       const DeepCollectionEquality().hash(_imageInfo),
       overview,
       genre,
       releaseYear,
-      tmdbId,
-      imdb);
+      tmdbID,
+      imdbID);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_ItemDetailInfoCopyWith<_$_ItemDetailInfo> get copyWith =>
-      __$$_ItemDetailInfoCopyWithImpl<_$_ItemDetailInfo>(this, _$identity);
+  _$$_ItemDetailInfoNewCopyWith<_$_ItemDetailInfoNew> get copyWith =>
+      __$$_ItemDetailInfoNewCopyWithImpl<_$_ItemDetailInfoNew>(
+          this, _$identity);
 }
 
-abstract class _ItemDetailInfo implements ItemDetailInfo {
-  const factory _ItemDetailInfo(
-      {required final LibrarySuper libraryData,
-      required final String imagePath,
-      required final String backdropImagePath,
-      required final List<dynamic> imageInfo,
-      required final String? overview,
-      required final String? genre,
-      required final String? releaseYear,
-      required final String? tmdbId,
-      required final String? imdb}) = _$_ItemDetailInfo;
+abstract class _ItemDetailInfoNew implements ItemDetailInfoNew {
+  const factory _ItemDetailInfoNew(
+      {required final String name,
+      required final String id,
+      required final BaseItemKind baseItemKind,
+      final String? posterImagePath,
+      final String? backdropImagePath,
+      final List<dynamic>? imageInfo,
+      final String? overview,
+      final String? genre,
+      final String? releaseYear,
+      final String? tmdbID,
+      final String? imdbID}) = _$_ItemDetailInfoNew;
 
   @override
-  LibrarySuper get libraryData;
+  String get name;
   @override
-  String get imagePath;
+  String get id;
   @override
-  String get backdropImagePath;
+  BaseItemKind get baseItemKind;
   @override
-  List<dynamic> get imageInfo;
+  String? get posterImagePath;
+  @override
+  String? get backdropImagePath;
+  @override
+  List<dynamic>? get imageInfo;
   @override
   String? get overview;
   @override
   String? get genre;
   @override
   String? get releaseYear;
-  @override // ProductionYear
-  String? get tmdbId;
-  @override //ProviderIds["Tmdb"]
-  String? get imdb;
+  @override
+  String? get tmdbID;
+  @override
+  String? get imdbID;
   @override
   @JsonKey(ignore: true)
-  _$$_ItemDetailInfoCopyWith<_$_ItemDetailInfo> get copyWith =>
+  _$$_ItemDetailInfoNewCopyWith<_$_ItemDetailInfoNew> get copyWith =>
       throw _privateConstructorUsedError;
 }

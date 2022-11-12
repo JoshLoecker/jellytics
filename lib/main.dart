@@ -36,20 +36,32 @@ class _StatefulApp extends State<StatefulApp> {
     FlutterNativeSplash.remove(); // App is built, OK to remove splash screen
   }
 
+  // This is a list of items that are being provided as the "content" widgets.
+  // Modifying content of these files will impact the view on the appropriate screen widget
+  static const List<Widget> _screenWidgets = <Widget>[
+    views.activityContent,
+    views.libraryContent,
+    views.statisticsContent,
+    views.settingsContent,
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(_appBarTitle),
+        elevation: 0,
       ),
       body: Center(
         child: _screenWidgets.elementAt(_currentNavIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
         elevation: 0, // no drop shadow
+        unselectedItemColor: Colors.grey[600],
+        showUnselectedLabels: true,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.tv_sharp),
+            icon: Icon(Icons.tv_outlined),
             label: "Activity",
           ),
           BottomNavigationBarItem(
@@ -57,7 +69,11 @@ class _StatefulApp extends State<StatefulApp> {
             label: "Library",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
+            icon: Icon(Icons.analytics_outlined),
+            label: "Statistics",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings_outlined),
             label: "Settings",
           ),
         ],
@@ -67,14 +83,6 @@ class _StatefulApp extends State<StatefulApp> {
       ),
     );
   }
-
-  // This is a list of items that are being provided as the "content" widgets.
-  // Modifying content of these files will impact the view on the appropriate screen widget
-  static const List<Widget> _screenWidgets = <Widget>[
-    views.activityContent,
-    views.libraryContent,
-    views.settingsContent,
-  ];
 
   // When tapping on the BottomNavBar, switch to the appropriate index
   void _onNavBarTapped(int index) {

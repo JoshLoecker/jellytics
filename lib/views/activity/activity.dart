@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jellytics/data_classes/active_streams.dart';
 import 'package:jellytics/views/activity/get_activity.dart';
-import 'package:jellytics/views/activity/activity_detail.dart';
 import 'package:jellytics/utils/secure_storage.dart';
 import 'package:jellytics/utils/screens.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -41,8 +40,9 @@ class _ActivityState extends State<_ActivityWidget> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  ActivityDetailWidget(streamData: streamData)),
+            builder: (context) => const Text(
+                "Hello World"), //LibraryItemDetails(itemInfo: streamData)),
+          ),
         );
       },
       child: defaultCard(

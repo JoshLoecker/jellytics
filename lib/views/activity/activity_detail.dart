@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jellytics/utils/secure_storage.dart';
 import 'package:jellytics/data_classes/active_streams.dart';
-import 'package:jellytics/views/activity/get_activity.dart';
-import 'package:jellytics/utils/screens.dart';
 
 class ActivityDetailWidget extends StatefulWidget {
   ActivityDetailWidget({required this.streamData, super.key});

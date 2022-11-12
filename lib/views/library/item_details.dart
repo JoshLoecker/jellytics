@@ -12,7 +12,7 @@ class LibraryItemDetails extends StatefulWidget {
     required this.itemInfo,
   });
 
-  final LibraryDetailInfo itemInfo;
+  final ItemDetailInfoNew itemInfo;
   final SecureStorage secureStorage = SecureStorage();
   bool noData = false;
   List<String> missingValues = <String>[];
@@ -48,7 +48,7 @@ class _LibraryItemDetailsState extends State<LibraryItemDetails> {
     }
   }
 
-  Widget itemDetails(ItemDetailInfo itemInfo) {
+  Widget itemDetails(ItemDetailInfoNew itemInfo) {
     return ListView(
       // These lines are required to limit the vertical viewport of the ListView
       // From:https://stackoverflow.com/questions/50252569
@@ -57,14 +57,14 @@ class _LibraryItemDetailsState extends State<LibraryItemDetails> {
       children: <Widget>[
         FadeInImage(
           placeholder: MemoryImage(kTransparentImage),
-          image: NetworkImage(itemInfo.backdropImagePath),
+          image: NetworkImage(itemInfo.backdropImagePath!),
           width: MediaQuery.of(context).size.width,
           fadeInDuration: const Duration(milliseconds: 200),
         ),
         Container(
           padding: const EdgeInsets.all(10),
           child: Text(
-            itemInfo.libraryData.name,
+            itemInfo.name,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: MediaQuery.of(context).size.width * 0.1,
@@ -75,8 +75,8 @@ class _LibraryItemDetailsState extends State<LibraryItemDetails> {
         rowDetails("Overview:", itemInfo.overview),
         rowDetails("Genres:", itemInfo.genre),
         rowDetails("Release Year:", itemInfo.releaseYear),
-        rowDetails("TMDB:", itemInfo.tmdbId),
-        rowDetails("IMDb ID:", itemInfo.imdb),
+        rowDetails("TMDB:", itemInfo.tmdbID),
+        rowDetails("IMDb ID:", itemInfo.imdbID),
       ],
     );
   }
@@ -85,11 +85,11 @@ class _LibraryItemDetailsState extends State<LibraryItemDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.itemInfo.libraryData.name),
+        title: Text(widget.itemInfo.name),
       ),
       body: FutureBuilder(
         future: getLibraryItemDetails(widget.itemInfo, widget.secureStorage),
-        builder: (context, AsyncSnapshot<ItemDetailInfo> futures) {
+        builder: (context, AsyncSnapshot<ItemDetailInfoNew> futures) {
           if (futures.hasData) {
             return itemDetails(futures.data!);
           } else {
