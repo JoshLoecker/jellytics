@@ -8,6 +8,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // return const CupertinoApp(
       title: "Jellytics",
       theme: ThemeData(brightness: Brightness.light), // light mode
       darkTheme: ThemeData(brightness: Brightness.dark), // dark mode
