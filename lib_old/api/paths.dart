@@ -182,20 +182,20 @@ class GETLibrary {
   }
 
   Future<Map<String, dynamic>> getByParentID({
-    required LibraryOverviewInfo parentInfo,
+    required ItemDetailInfoNew parentInfo,
   }) async {
     CreateRequest request = await CreateRequest.construct();
     final GET items = GET(
-        "/Users/${await _storage.getUserID()}/Items?parentId=${parentInfo.libraryData.id}&includeItemType=${parentInfo.libraryData.baseItemKind.name}");
+        "/Users/${await _storage.getUserID()}/Items?parentId=${parentInfo.id}&includeItemType=${parentInfo.baseItemKind.name}");
     return await request.get(items).then((response) => response.data);
   }
 
   Future<Map<String, dynamic>> getByID({
-    required LibraryDetailInfo itemInfo,
+    required ItemDetailInfoNew itemInfo,
   }) async {
     CreateRequest request = await CreateRequest.construct();
-    final GET itemPath = GET(
-        "/Users/${await _storage.getUserID()}/Items/${itemInfo.libraryData.id}");
+    final GET itemPath =
+        GET("/Users/${await _storage.getUserID()}/Items/${itemInfo.id}");
 
     return await request.get(itemPath).then((response) => response.data);
   }

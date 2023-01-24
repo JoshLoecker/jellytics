@@ -1,10 +1,57 @@
 import 'package:jellytics/api/paths.dart';
+import 'package:jellytics/api/print.dart';
+import 'package:jellytics/data_classes/libraries.dart';
 import 'package:jellytics/data_classes/active_streams.dart';
+import 'package:jellytics/views/library/query.dart';
+
+Future<List<ItemDetailInfoNew>> getActivityNew() async {
+  /// This function will build a list of StreamsData instances
+  ///
+  /// It will be used to display data on the "Activity" Page
+  GETSession session = GETSession();
+  List<dynamic> activeStreams = await session.getActiveStreams();
+  List<ItemDetailInfoNew> nowPlayingStreams = <ItemDetailInfoNew>[];
+
+  for (int i = 0; i < activeStreams.length; i++) {
+    Map<String, dynamic> currentStream = await activeStreams[i];
+
+    prettyPrintJSON(currentStream);
+
+    // Find streams that are playing media
+    // We will add these to the nowPlayingStreams
+    if (await currentStream["NowPlayingItems"] != null) {
+      MediaFormat mediaType = getMediaFormat(currentStream);
+      String id = (mediaType == MediaFormat.movie)
+          ? currentStream["NowPlayingItem"]["Id"]
+          : currentStream["NowPlayingItem"]["SeriesId"];
+
+      ItemDetailInfoNew data = ItemDetailInfoNew(
+        name: "",
+        id: id,
+        baseItemKind: BaseItemKind.values.firstWhere(
+          (element) =>
+              element.name.toLowerCase() == currentStream["Type"].toLowerCase(),
+        ),
+        posterImagePath: "",
+        backdropImagePath: "",
+        imageInfo: null,
+        overview: "",
+        genre: "",
+        releaseYear: "",
+        tmdbID: "",
+        imdbID: "",
+      );
+      nowPlayingStreams.add(data);
+    }
+  }
+  return nowPlayingStreams;
+}
 
 Future<List<StreamsData>> getActivity() async {
   /// This function will build a list of StreamsData instances
   ///
   /// It will be used to display data on the "Activity" Page
+  await getActivityNew();
   GETSession session = GETSession();
   List<dynamic> activeStreams = await session.getActiveStreams();
   List<StreamsData> nowPlayingStreams = <StreamsData>[];
