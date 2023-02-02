@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jellytics/client/client.dart';
-import 'package:jellytics/widgets/settings/settings.dart';
-import 'package:jellytics/widgets/library/library.dart';
-import 'package:jellytics/utils/storage.dart' as storage;
-import 'package:jellytics/providers/serverDetails.dart' as server_details;
+import 'package:jellytics/views/views.dart' as views;
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -25,40 +19,35 @@ class App extends StatelessWidget {
   }
 }
 
-class StatefulApp extends ConsumerStatefulWidget {
+class StatefulApp extends StatefulWidget {
   const StatefulApp({super.key});
 
   @override
-  ConsumerState<StatefulApp> createState() => _StatefulApp();
+  State<StatefulApp> createState() => _StatefulApp();
 }
 
-class _StatefulApp extends ConsumerState<StatefulApp> {
+class _StatefulApp extends State<StatefulApp> {
   int _currentNavIndex = 0;
   final String _appBarTitle = "Jellytics";
 
   @override
   void initState() {
     super.initState();
-    if (!kIsWeb) {
-      FlutterNativeSplash.remove(); // App is built, OK to remove splash screen
-    }
+
+    FlutterNativeSplash.remove(); // App is built, OK to remove splash screen
   }
 
   // This is a list of items that are being provided as the "content" widgets.
   // Modifying content of these files will impact the view on the appropriate screen widget
   static const List<Widget> _screenWidgets = <Widget>[
-    Text("Activity"),
-    Library(),
-    Text("Statistics"),
-    Settings(),
+    views.activityContent,
+    views.libraryContent,
+    views.statisticsContent,
+    views.settingsContent,
   ];
 
   @override
   Widget build(BuildContext context) {
-    // Load the jellyfin client provider
-    ref.watch(jellyFactory.notifier);
-
-    // set the server details from storage
     return Scaffold(
       appBar: AppBar(
         title: Text(_appBarTitle),
@@ -108,17 +97,7 @@ class _StatefulApp extends ConsumerState<StatefulApp> {
 void main() {
   // Keep splash screen until I say it is cleared
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  // Check if the platform is not web
-  if (!kIsWeb) {
-    // If it is not web, then we need to initialize the storage
-    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  }
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  runApp(
-    const ProviderScope(
-      child: App(),
-    ),
-  );
-
-  // runApp(const ProviderScope(child: App()));
+  runApp(const App());
 }
