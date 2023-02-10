@@ -1,6 +1,5 @@
-import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/scheduler.dart';
 
 bool isDarkMode() {
@@ -40,5 +39,28 @@ Widget loggedInStatusWidget({required bool isLoggedIn, String? username}) {
         fontSize: 20,
       ),
     ),
+  );
+}
+
+Widget cupertinoTabBarBuilder() {
+  return CupertinoTabBar(
+    items: const <BottomNavigationBarItem>[
+      BottomNavigationBarItem(
+        icon: Icon(Icons.tv_sharp),
+        label: "Activity",
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.storage_outlined),
+        label: "Library",
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.bar_chart),
+        label: "Statistics",
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.settings),
+        label: "Settings",
+      ),
+    ],
   );
 }

@@ -7,26 +7,22 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:jellytics/utils/interface.dart' as ui;
 
-Widget cardContainer(Widget child, {double maxCardHeight = 200}) {
-  return Container(
-    constraints: BoxConstraints.expand(
-      width: ui.safeWidth(),
-      height: maxCardHeight,
-    ),
-    alignment: Alignment.center,
-    decoration: BoxDecoration(
-      // Set color of card background based on light/dark mode
-      color: ui.isDarkMode() ? Colors.grey[350] : Colors.grey[500],
-      borderRadius: const BorderRadius.all(
-        Radius.circular(10),
+Widget cardContainer(
+  Widget child, {
+  double maxCardHeight = 200,
+  EdgeInsets margin = const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+}) {
+  return SafeArea(
+    child: Container(
+      margin: margin,
+      constraints: BoxConstraints.expand(
+        width: ui.safeWidth(),
+        height: maxCardHeight,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: child,
       ),
     ),
-    padding: const EdgeInsets.all(5),
-    margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-    child: child,
   );
-}
-
-Widget card(String title) {
-  return Text(title);
 }

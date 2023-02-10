@@ -41,11 +41,12 @@ class _ServerAddress extends AsyncNotifier<String> {
   }
 }
 
-class _Username extends Notifier<String> {
+class _Username extends AsyncNotifier<String> {
   String username = "";
 
   @override
-  String build() {
+  Future<String> build() async {
+    username = await storage.getUsername();
     return username;
   }
 }
@@ -59,18 +60,20 @@ class _Password extends Notifier<String> {
   }
 }
 
-class _AccessToken extends Notifier<String> {
+class _AccessToken extends AsyncNotifier<String> {
   String accessToken = "";
 
   @override
-  String build() {
+  Future<String> build() async {
+    accessToken = await storage.getAccessToken();
     return accessToken;
   }
 }
 
 final serverAddressProvider =
     AsyncNotifierProvider<_ServerAddress, String>(_ServerAddress.new);
-final usernameProvider = NotifierProvider<_Username, String>(_Username.new);
+final usernameProvider =
+    AsyncNotifierProvider<_Username, String>(_Username.new);
 final passwordProvider = NotifierProvider<_Password, String>(_Password.new);
 final accessTokenProvider =
-    NotifierProvider<_AccessToken, String>(_AccessToken.new);
+    AsyncNotifierProvider<_AccessToken, String>(_AccessToken.new);

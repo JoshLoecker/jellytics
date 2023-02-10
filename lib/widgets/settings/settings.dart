@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,6 +6,8 @@ import 'package:jellytics/client/client.dart';
 import 'package:jellytics/providers/serverDetails.dart' as server;
 import 'package:jellytics/utils/storage.dart' as storage;
 import 'package:jellytics/utils/interface.dart';
+
+const double _kItemExtent = 32.0;
 
 class SettingsView extends StatelessWidget {
   const SettingsView({Key? key}) : super(key: key);
@@ -40,12 +43,36 @@ class SettingsState extends ConsumerState<Settings> {
     }
   }
 
-  Future<String> getUsername() async {
-    return await storage.getUsername();
-  }
-
-  bool getLoginColor() {
-    return false;
+  void _showActionSheet(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) => CupertinoActionSheet(
+        title: const Text("Title"),
+        message: const Text("Message"),
+        actions: <CupertinoActionSheetAction>[
+          CupertinoActionSheetAction(
+            onPressed: () {
+              setState(() {
+                ref.watch(server.serverAddressProvider.notifier).protocol =
+                    "http://";
+              });
+              Navigator.pop(context);
+            },
+            child: const Text("http://"),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              setState(() {
+                ref.watch(server.serverAddressProvider.notifier).protocol =
+                    "https://";
+              });
+              Navigator.pop(context);
+            },
+            child: const Text("https://"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -55,8 +82,6 @@ class SettingsState extends ConsumerState<Settings> {
     final TextEditingController usernameController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
     final JellyfinFactory jellyClient = ref.watch(jellyFactory.notifier);
-
-    // print("STATE: ${ref.watch(jellyFactory.notifier).state.value?.options.headers}");
 
     return Container(
       margin: const EdgeInsets.all(25),
@@ -69,36 +94,21 @@ class SettingsState extends ConsumerState<Settings> {
           // Add padding on the color around the text
           loggedInStatusWidget(
               isLoggedIn: ref.watch(jellyFactory.notifier).isLoggedIn,
-              username: jellyClient.username),
+              username: ref
+                  .watch(server.usernameProvider.notifier)
+                  .username
+                  .toString()),
           // Drop-down widget with options "http://" and "https://"
           Row(
             children: <Widget>[
-              Container(
-                margin: const EdgeInsets.only(top: 19),
-                child: DropdownButton(
-                  value:
-                      ref.watch(server.serverAddressProvider.notifier).protocol,
-                  items: const [
-                    DropdownMenuItem(
-                      value: "http://",
-                      child: Text("http://"),
-                    ),
-                    DropdownMenuItem(
-                      value: "https://",
-                      child: Text("https://"),
-                    ),
-                  ],
-                  onChanged: (changedState) {
-                    setState(() {
-                      changedState == "http://"
-                          ? ref
-                              .watch(server.serverAddressProvider.notifier)
-                              .protocol = "http://"
-                          : ref
-                              .watch(server.serverAddressProvider.notifier)
-                              .protocol = "https://";
-                    });
-                  },
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                // onPressed: showPopupDialog,
+                onPressed: () {
+                  _showActionSheet(context);
+                },
+                child: Text(
+                  ref.watch(server.serverAddressProvider.notifier).protocol,
                 ),
               ),
               // Server URL input
@@ -117,16 +127,22 @@ class SettingsState extends ConsumerState<Settings> {
                       await storage.storeServerPort(port);
                     }
                   },
-                  child: TextFormField(
-                    decoration: const InputDecoration(
-                      hintText: "192.168.1.10:8096",
-                      labelText: "Server URL",
-                    ),
-                    initialValue: getInitialServerAddress(),
-                    onChanged: (String value) {
-                      serverUrlController.text = value.toString();
-                    },
-                  ),
+                  child: CupertinoTextField(
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: CupertinoColors.systemGrey,
+                            width: 0.0, // One physical pixel.
+                            style: BorderStyle.solid,
+                          ),
+                        ),
+                      ),
+                      placeholder: "192.168.1.10",
+                      onChanged: (String value) {
+                        serverUrlController.text = value.toString();
+                      }),
                 ),
               ),
             ],
@@ -142,12 +158,19 @@ class SettingsState extends ConsumerState<Settings> {
                       ref.watch(server.usernameProvider.notifier).username);
                 }
               },
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  label: Text("Username"),
+              child: CupertinoTextField(
+                autocorrect: false,
+                enableSuggestions: false,
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: CupertinoColors.systemGrey,
+                      width: 0.0, // One physical pixel.
+                      style: BorderStyle.solid,
+                    ),
+                  ),
                 ),
-                initialValue:
-                    ref.watch(server.usernameProvider.notifier).username,
+                placeholder: "Username",
                 onChanged: (String value) {
                   usernameController.text = value.toString();
                 },
@@ -162,14 +185,20 @@ class SettingsState extends ConsumerState<Settings> {
                       passwordController.text;
                 }
               },
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  label: Text("Password"),
-                ),
-                initialValue:
-                    ref.watch(server.passwordProvider.notifier).password,
+              child: CupertinoTextField(
+                autocorrect: false,
                 obscureText: true,
-                // Update text on change
+                enableSuggestions: false,
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: CupertinoColors.systemGrey,
+                      width: 0.0, // One physical pixel.
+                      style: BorderStyle.solid,
+                    ),
+                  ),
+                ),
+                placeholder: "Password",
                 onChanged: (String value) {
                   passwordController.text = value.toString();
                 },
@@ -181,10 +210,11 @@ class SettingsState extends ConsumerState<Settings> {
             margin: const EdgeInsets.only(top: 20),
           ),
           // Login button
-          ElevatedButton(
+          CupertinoButton(
             onPressed: () async {
               await ref.watch(jellyFactory.notifier).build();
               await ref.read(server.serverAddressProvider.notifier).saveData();
+
               setState(() {
                 ref.watch(jellyFactory.notifier).isLoggedIn = true;
               });
@@ -194,16 +224,18 @@ class SettingsState extends ConsumerState<Settings> {
           Container(
             margin: const EdgeInsets.only(top: 20),
           ),
-          ElevatedButton(
-            // Set color of button to red
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
+          CupertinoButton(
+            color: Colors.red,
             onPressed: () async {
               await storage.clearStorage();
               jellyClient.dio.options.headers =
                   await jellyClient.dio.options.headers.remove("Token");
 
+              WidgetsBinding.instance
+                  .addPostFrameCallback((_) => setState(() async {
+                        await storage.clearStorage();
+                        ref.watch(jellyFactory.notifier).isLoggedIn = false;
+                      }));
               setState(() {
                 ref.watch(jellyFactory.notifier).isLoggedIn = false;
               });
@@ -216,7 +248,7 @@ class SettingsState extends ConsumerState<Settings> {
               margin: const EdgeInsets.only(top: 20),
             ),
           if (kDebugMode)
-            ElevatedButton(
+            CupertinoButton(
               onPressed: () async {
                 if (kDebugMode) {
                   print("");

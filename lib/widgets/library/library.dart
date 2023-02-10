@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellytics/models/cardWidget.dart';
@@ -5,8 +6,7 @@ import 'package:jellytics/client/client.dart';
 import 'package:jellytics/utils/storage.dart' as storage;
 import 'package:jellytics/providers/serverDetails.dart' as server;
 import 'package:jellytics/utils/interface.dart';
-import 'package:jellytics/models/movie.dart';
-import 'package:jellytics/models/base.dart';
+import 'package:jellytics/widgets/library/library_detail.dart';
 
 class LibraryView extends StatelessWidget {
   const LibraryView({Key? key}) : super(key: key);
@@ -34,37 +34,72 @@ class LibraryState extends ConsumerState<Library> {
     super.initState();
   }
 
-  Future<Widget> libraryListBuilder() async {
+  Future<Widget> libraryListBuilder(bool isLoggedIn) async {
     // If not logged in, return loggedInStatusWidget
-    if (!ref.watch(jellyFactory.notifier).isLoggedIn) {
-      return loggedInStatusWidget(isLoggedIn: false);
+    if (!isLoggedIn) {
+      Widget col = Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          loggedInStatusWidget(isLoggedIn: false),
+          CupertinoButton(
+            onPressed: () async {
+              {
+                print("");
+                print(
+                    "Headers: ${ref.watch(jellyFactory.notifier).dio.options.headers}");
+                print("Username: ${await storage.getUsername()}");
+                print("UserID: ${await storage.getUserID()}");
+                print("Protocol: ${await storage.getServerProtocol()}");
+                print("IP: ${await storage.getServerIP()}");
+                print("Port: ${await storage.getServerPort()}");
+                print(
+                    "Final Server Address: ${await storage.getFinalServerAddress()}");
+                print("Access Token: ${await storage.getAccessToken()}");
+                print("");
+              }
+            },
+            child: const Text("Print SecureStorage"),
+          ),
+        ],
+      );
+      return col;
     }
+
+    String serverAddress =
+        ref.watch(server.serverAddressProvider.notifier).fullAddress;
 
     final Map<String, dynamic> libraryJSON = await ref
         .watch(jellyFactory.notifier)
         .dio
         .get("/Items", queryParameters: {
-      "userId": await storage.getUserID(),
+      "userId": ref.watch(server.serverAddressProvider.notifier).userId,
     }).then((value) => value.data);
 
-    // Map<String, dynamic> libraryJSON = await libraryList.data;
     return ListView(
       children: <Widget>[
         for (var i = 0; i < libraryJSON["TotalRecordCount"]; i++)
           cardContainer(
-            InkWell(
-              onTap: () {
-                print("Tapped on ${libraryJSON['Items'][i]['Name']}");
-                print(
-                    "Network image: ${ref.watch(server.serverAddressProvider.notifier).fullAddress}/Items/${libraryJSON['Items'][i]['Id']}/Images/Primary");
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  image: DecorationImage(
-                    image: NetworkImage(
-                        "${ref.watch(server.serverAddressProvider.notifier).fullAddress}/Items/${libraryJSON['Items'][i]['Id']}/Images/Primary"),
-                    fit: BoxFit.cover,
+            Material(
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => LibraryDetail(
+                        libraryName: libraryJSON["Items"][i]["Name"],
+                        libraryId: libraryJSON["Items"][i]["Id"],
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    image: DecorationImage(
+                      image: NetworkImage(
+                          "$serverAddress/Items/${libraryJSON['Items'][i]['Id']}/Images/Primary"),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
@@ -76,31 +111,26 @@ class LibraryState extends ConsumerState<Library> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: libraryListBuilder(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              return const Text("No connection");
-            case ConnectionState.waiting:
-            case ConnectionState.active:
-              return const Center(child: CircularProgressIndicator());
-            case ConnectionState.done:
-              if (snapshot.hasError) {
-                return Text("Error: ${snapshot.error}");
-              } else {
-                return snapshot.data;
-              }
-          }
-        });
+    bool isLoggedIn = ref.watch(jellyFactory.notifier).isLoggedIn;
 
-    // Return an infinite scrolling list of numbers
-    // return ListView.builder(
-    //   // set itemCount
-    //   itemCount: Future.value(numLibraries),
-    //   itemBuilder: (context, index) {
-    //     return const Text("Card");
-    //   },
-    // );
+    return FutureBuilder(
+      future: libraryListBuilder(isLoggedIn),
+      initialData: const Center(child: CupertinoActivityIndicator()),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+            return const Text("No connection");
+          case ConnectionState.waiting:
+          case ConnectionState.active:
+            return const Center(child: CupertinoActivityIndicator());
+          case ConnectionState.done:
+            if (snapshot.hasError) {
+              return Text("Error: ${snapshot.error}");
+            } else {
+              return snapshot.data;
+            }
+        }
+      },
+    );
   }
 }

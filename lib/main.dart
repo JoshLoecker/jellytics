@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -5,43 +6,35 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellytics/client/client.dart';
 import 'package:jellytics/widgets/settings/settings.dart';
 import 'package:jellytics/widgets/library/library.dart';
-import 'package:jellytics/utils/storage.dart' as storage;
-import 'package:jellytics/providers/serverDetails.dart' as server_details;
 
 class App extends StatelessWidget {
   const App({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      // return const CupertinoApp(
+    return const CupertinoApp(
       title: "Jellytics",
-      theme: ThemeData(brightness: Brightness.light), // light mode
-      darkTheme: ThemeData(brightness: Brightness.dark), // dark mode
-      themeMode: ThemeMode.system, // follow system theme
+      theme: CupertinoThemeData(brightness: Brightness.dark),
       debugShowCheckedModeBanner: false,
-      home: const StatefulApp(),
+      home: HomePage(),
     );
   }
 }
 
-class StatefulApp extends ConsumerStatefulWidget {
-  const StatefulApp({super.key});
+class HomePage extends ConsumerStatefulWidget {
+  const HomePage({super.key});
 
   @override
-  ConsumerState<StatefulApp> createState() => _StatefulApp();
+  ConsumerState<HomePage> createState() => _StatefulApp();
 }
 
-class _StatefulApp extends ConsumerState<StatefulApp> {
-  int _currentNavIndex = 0;
+class _StatefulApp extends ConsumerState<HomePage> {
   final String _appBarTitle = "Jellytics";
 
   @override
   void initState() {
     super.initState();
-    if (!kIsWeb) {
-      FlutterNativeSplash.remove(); // App is built, OK to remove splash screen
-    }
+    if (!kIsWeb) FlutterNativeSplash.remove();
   }
 
   // This is a list of items that are being provided as the "content" widgets.
@@ -59,15 +52,8 @@ class _StatefulApp extends ConsumerState<StatefulApp> {
     ref.watch(jellyFactory.notifier);
 
     // set the server details from storage
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_appBarTitle),
-      ),
-      body: Center(
-        child: _screenWidgets.elementAt(_currentNavIndex),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        elevation: 0, // no drop shadow
+    return CupertinoTabScaffold(
+      tabBar: CupertinoTabBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.tv_sharp),
@@ -78,47 +64,40 @@ class _StatefulApp extends ConsumerState<StatefulApp> {
             label: "Library",
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: "Statistics",
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: "Settings",
           ),
         ],
-        currentIndex: _currentNavIndex,
-        selectedItemColor: const Color(0xff0066ff),
-        onTap: _onNavBarTapped,
       ),
+      tabBuilder: (BuildContext context, int index) {
+        return CupertinoTabView(
+          builder: (BuildContext context) {
+            return CupertinoPageScaffold(
+              navigationBar: CupertinoNavigationBar(
+                middle: Text(_appBarTitle),
+              ),
+              child: Center(
+                child: _screenWidgets.elementAt(index),
+              ),
+            );
+          },
+        );
+      },
     );
-  }
-
-  // This is a list of items that are being provided as the "content" widgets.
-  // Modifying content of these files will impact the view on the appropriate screen widget
-  static const List<Widget> _screenWidgets = <Widget>[
-    views.activityContent,
-    views.libraryContent,
-    views.settingsContent,
-  ];
-
-  // When tapping on the BottomNavBar, switch to the appropriate index
-  void _onNavBarTapped(int index) {
-    setState(() {
-      _currentNavIndex = index;
-    });
   }
 }
 
 void main() {
   // Keep splash screen until I say it is cleared
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  // Check if the platform is not web
-  if (!kIsWeb) {
-    // If it is not web, then we need to initialize the storage
-    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  }
-
+  if (!kIsWeb) FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   runApp(
     const ProviderScope(
       child: App(),
     ),
   );
-
-  // runApp(const ProviderScope(child: App()));
 }

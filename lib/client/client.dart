@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellytics/utils/storage.dart' as storage;
 import 'package:jellytics/providers/serverDetails.dart';
 
-class JellyfinFactory extends AsyncNotifier<Dio> {
+class JellyfinFactory extends AsyncNotifier<JellyfinFactory> {
   Dio dio = Dio();
   bool isLoggedIn = false;
   String username = "";
@@ -57,21 +57,16 @@ class JellyfinFactory extends AsyncNotifier<Dio> {
   }
 
   @override
-  Future<Dio> build() async {
-    String protocol = await storage.getServerProtocol() == ""
-        ? "http://"
-        : await storage.getServerProtocol();
-    String ipAddress =
-        await storage.getServerIP() == "" ? "" : await storage.getServerIP();
-    String port = await storage.getServerPort() == ""
-        ? ""
-        : await storage.getServerPort();
-    username = await storage.getUsername() == ""
-        ? ref.watch(usernameProvider.notifier).username
-        : await storage.getUsername();
-    String password = ref.watch(passwordProvider.notifier).password;
+  Future<JellyfinFactory> build() async {
+    JellyfinFactory factory = JellyfinFactory();
 
+    String protocol = ref.watch(serverAddressProvider.notifier).protocol;
+    String ipAddress = ref.watch(serverAddressProvider.notifier).ipAddress;
+    String port = ref.watch(serverAddressProvider.notifier).port;
+    username = ref.watch(usernameProvider.notifier).username;
+    String password = ref.watch(passwordProvider.notifier).password;
     late Dio internalDio;
+
     if (await storage.getAccessToken() == "" ||
         await storage.getUserID() == "") {
       internalDio = await JellyfinFactory.getAccessTokenFromUsernamePassword(
@@ -89,11 +84,9 @@ class JellyfinFactory extends AsyncNotifier<Dio> {
 
     ref.watch(serverAddressProvider.notifier).userId =
         await storage.getUserID();
-
-    // Set isLoggedIn to true if the user is logged in
     isLoggedIn = true;
 
-    return dio;
+    return factory;
   }
 }
 
@@ -105,5 +98,5 @@ extension JellyfinFactoryImages on JellyfinFactory {
   }
 }
 
-final jellyFactory =
-    AsyncNotifierProvider<JellyfinFactory, Dio>(JellyfinFactory.new);
+final jellyFactory = AsyncNotifierProvider<JellyfinFactory, JellyfinFactory>(
+    JellyfinFactory.new);

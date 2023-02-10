@@ -13,39 +13,40 @@ class ImagePaths {
   late String boxRear;
   late String profile;
 
-  ImagePaths(
-      [this.primary = "",
-      this.art = "",
-      this.backdrop = "",
-      this.banner = "",
-      this.logo = "",
-      this.thumb = "",
-      this.disc = "",
-      this.box = "",
-      this.screenshot = "",
-      this.menu = "",
-      this.chapter = "",
-      this.boxRear = "",
-      this.profile = ""]);
+  ImagePaths({
+    this.primary = "",
+    this.art = "",
+    this.backdrop = "",
+    this.banner = "",
+    this.logo = "",
+    this.thumb = "",
+    this.disc = "",
+    this.box = "",
+    this.screenshot = "",
+    this.menu = "",
+    this.chapter = "",
+    this.boxRear = "",
+    this.profile = "",
+  });
 }
 
 class BaseModel {
-  late final String title;
-  final int year;
-  final String description;
+  String name;
+  String id;
+  String parentId;
+  String year;
+  String type;
+  String path;
+  String overview;
   ImagePaths imagePaths;
 
   BaseModel(
-      {required this.title,
+      {required this.name,
+      required this.id,
+      required this.parentId,
       required this.year,
-      required this.description,
+      required this.path,
+      required this.type,
+      required this.overview,
       required this.imagePaths});
-
-  factory BaseModel.fromJson(Map<String, dynamic> json, ImagePaths imagePaths) {
-    return BaseModel(
-        title: json['Title'],
-        year: json['ProductionYear'],
-        description: json['Overview'],
-        imagePaths: imagePaths);
-  }
 }
