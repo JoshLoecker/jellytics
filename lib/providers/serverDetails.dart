@@ -1,79 +1,107 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+// Freezed
+import 'package:flutter/foundation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+// Riverpod
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+// Additional imports
 import 'package:jellytics/utils/storage.dart' as storage;
 
-class _ServerAddress extends AsyncNotifier<String> {
-  String protocol = "http://";
-  String ipAddress = "";
-  String port = "";
-  String userId = "";
-  String fullAddress = "";
+part 'serverDetails.freezed.dart';
+part 'serverDetails.g.dart';
 
+@freezed
+class ServerData with _$ServerData {
+  factory ServerData({
+    required String protocol,
+    required String ipAddress,
+    required String port,
+    required String fullAddress,
+    required String userId,
+    required String username,
+    required String accessToken,
+    required String password,
+  }) = _ServerData;
+}
+
+@riverpod
+class ServerDetails extends _$ServerDetails {
   @override
-  Future<String> build() async {
-    // Test if storage.getServerProtocol() is empty. If it is empty, set it to "http://"
-    protocol = await storage.getServerProtocol() == ""
-        ? "http://"
-        : await storage.getServerProtocol();
-    ipAddress =
-        await storage.getServerIP() == "" ? "" : await storage.getServerIP();
-    port = await storage.getServerPort() == ""
-        ? ""
-        : await storage.getServerPort();
-    fullAddress =
-        "${ref.watch(serverAddressProvider.notifier).protocol}${ref.watch(serverAddressProvider.notifier).ipAddress}:${ref.watch(serverAddressProvider.notifier).port}";
-    return "$protocol$ipAddress:$port";
+  ServerData build() {
+    return ServerData(
+      protocol: "http://",
+      ipAddress: "",
+      port: "",
+      fullAddress: "",
+      userId: "",
+      username: "",
+      accessToken: "",
+      password: "",
+    );
+  }
+
+  // ----- Setters -----
+  set protocol(String protocol_) {
+    state = state.copyWith(protocol: protocol_);
+  }
+
+  set ipAddress(String ipAddress_) {
+    state = state.copyWith(ipAddress: ipAddress_);
+  }
+
+  set port(String port_) {
+    state = state.copyWith(port: port_);
+  }
+
+  set fullAddress(String fullAddress_) {
+    state = state.copyWith(fullAddress: fullAddress_);
+  }
+
+  set userId(String userId_) {
+    state = state.copyWith(userId: userId_);
+  }
+
+  set username(String username) {
+    state = state.copyWith(username: username);
+  }
+
+  set accessToken(String accessToken) {
+    state = state.copyWith(accessToken: accessToken);
+  }
+
+  set password(String password) {
+    state = state.copyWith(password: password);
+  }
+
+  // ----- Getters -----
+  String get protocol => state.protocol;
+  String get ipAddress => state.ipAddress;
+  String get port => state.port;
+  String get fullAddress => state.fullAddress;
+  String get userId => state.userId;
+  String get username => state.username;
+  String get accessToken => state.accessToken;
+
+  // ----- Other -----
+  void logout() {
+    state = state.copyWith(
+      protocol: "http://",
+      ipAddress: "",
+      port: "",
+      fullAddress: "",
+      userId: "",
+      username: "",
+      accessToken: "",
+      password: "",
+    );
   }
 
   Future<void> saveData() async {
-    await storage.storeServerIP(ipAddress);
-    await storage.storeServerPort(port);
-    await storage.storeServerProtocol(protocol);
-    await storage.storeUserID(userId);
-  }
-
-  String getAddress() {
-    if (ref.watch(serverAddressProvider.notifier).port == "") {
-      return "${ref.watch(serverAddressProvider.notifier).protocol}${ref.watch(serverAddressProvider.notifier).ipAddress}";
-    } else {
-      return "${ref.watch(serverAddressProvider.notifier).protocol}${ref.watch(serverAddressProvider.notifier).ipAddress}:${ref.watch(serverAddressProvider.notifier).port}";
-    }
+    await storage.storeServerIP(state.ipAddress);
+    await storage.storeServerPort(state.port);
+    await storage.storeServerProtocol(state.protocol);
+    await storage.storeUserId(state.userId);
+    await storage.storeUsername(state.username);
   }
 }
-
-class _Username extends AsyncNotifier<String> {
-  String username = "";
-
-  @override
-  Future<String> build() async {
-    username = await storage.getUsername();
-    return username;
-  }
-}
-
-class _Password extends Notifier<String> {
-  String password = "";
-
-  @override
-  String build() {
-    return password;
-  }
-}
-
-class _AccessToken extends AsyncNotifier<String> {
-  String accessToken = "";
-
-  @override
-  Future<String> build() async {
-    accessToken = await storage.getAccessToken();
-    return accessToken;
-  }
-}
-
-final serverAddressProvider =
-    AsyncNotifierProvider<_ServerAddress, String>(_ServerAddress.new);
-final usernameProvider =
-    AsyncNotifierProvider<_Username, String>(_Username.new);
-final passwordProvider = NotifierProvider<_Password, String>(_Password.new);
-final accessTokenProvider =
-    AsyncNotifierProvider<_AccessToken, String>(_AccessToken.new);

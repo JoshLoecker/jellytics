@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellytics/client/client.dart';
+import 'package:jellytics/providers/serverDetails.dart';
 import 'package:jellytics/widgets/settings/settings.dart';
 import 'package:jellytics/widgets/library/library.dart';
 
@@ -49,7 +50,8 @@ class _StatefulApp extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     // Load the jellyfin client provider
-    ref.watch(jellyFactory.notifier);
+    ref.watch(clientDetailsProvider.notifier);
+    ref.watch(serverDetailsProvider.notifier);
 
     // set the server details from storage
     return CupertinoTabScaffold(

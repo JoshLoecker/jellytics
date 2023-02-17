@@ -3,11 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellytics/client/client.dart';
-import 'package:jellytics/providers/serverDetails.dart' as server;
+import 'package:jellytics/providers/serverDetails.dart';
 import 'package:jellytics/utils/storage.dart' as storage;
 import 'package:jellytics/utils/interface.dart';
-
-const double _kItemExtent = 32.0;
 
 class SettingsView extends StatelessWidget {
   const SettingsView({Key? key}) : super(key: key);
@@ -27,34 +25,30 @@ class Settings extends ConsumerStatefulWidget {
   ConsumerState<Settings> createState() => SettingsState();
 }
 
-class SettingsState extends ConsumerState<Settings> {
+class SettingsState extends ConsumerState<Settings> with clientFromStorage {
+  final protocolController = TextEditingController();
+  final serverUrlController = TextEditingController();
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
-  }
-
-  String getInitialServerAddress() {
-    if (ref.watch(server.serverAddressProvider.notifier).ipAddress == "") {
-      return "";
-    } else if (ref.watch(server.serverAddressProvider.notifier).port == "") {
-      return ref.watch(server.serverAddressProvider.notifier).ipAddress;
-    } else {
-      return "${ref.watch(server.serverAddressProvider.notifier).ipAddress}:${ref.watch(server.serverAddressProvider.notifier).port}";
-    }
+    initClient(ref);
   }
 
   void _showActionSheet(BuildContext context) {
     showCupertinoModalPopup(
       context: context,
       builder: (BuildContext context) => CupertinoActionSheet(
-        title: const Text("Title"),
-        message: const Text("Message"),
+        title: const Text("Protocol"),
+        message: const Text("Select a protocol for your server"),
         actions: <CupertinoActionSheetAction>[
           CupertinoActionSheetAction(
             onPressed: () {
               setState(() {
-                ref.watch(server.serverAddressProvider.notifier).protocol =
-                    "http://";
+                protocolController.text = "http://";
+                ref.read(serverDetailsProvider.notifier).protocol = "http://";
               });
               Navigator.pop(context);
             },
@@ -63,8 +57,8 @@ class SettingsState extends ConsumerState<Settings> {
           CupertinoActionSheetAction(
             onPressed: () {
               setState(() {
-                ref.watch(server.serverAddressProvider.notifier).protocol =
-                    "https://";
+                protocolController.text = "https://";
+                ref.read(serverDetailsProvider.notifier).protocol = "https://";
               });
               Navigator.pop(context);
             },
@@ -75,13 +69,102 @@ class SettingsState extends ConsumerState<Settings> {
     );
   }
 
+  CupertinoTextField usernameTextField() {
+    return CupertinoTextField(
+      autocorrect: false,
+      enableSuggestions: false,
+      decoration: const BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: CupertinoColors.systemGrey,
+            width: 0.0, // One physical pixel.
+            style: BorderStyle.solid,
+          ),
+        ),
+      ),
+      placeholder: "Username",
+      controller: usernameController,
+      onChanged: (String value) {
+        if (value.isNotEmpty) {
+          usernameController.text = value.toString();
+          // Place the cursor at the end of the text
+          usernameController.selection = TextSelection.fromPosition(
+              TextPosition(offset: usernameController.text.length));
+        }
+      },
+    );
+  }
+
+  CupertinoTextField passwordTextField() {
+    return CupertinoTextField(
+      autocorrect: false,
+      obscureText: true,
+      enableSuggestions: false,
+      decoration: const BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: CupertinoColors.systemGrey,
+            width: 0.0, // One physical pixel.
+            style: BorderStyle.solid,
+          ),
+        ),
+      ),
+      placeholder: "Password",
+      controller: passwordController,
+      onChanged: (String value) {
+        if (value.isNotEmpty) {
+          passwordController.text = value.toString();
+          // Place the cursor at the end of the text
+          passwordController.selection = TextSelection.fromPosition(
+              TextPosition(offset: passwordController.text.length));
+        }
+      },
+    );
+  }
+
+  CupertinoButton loginButton() {
+    return CupertinoButton(
+      onPressed: () async {
+        String ipAddress = serverUrlController.value.text.split(":")[0];
+        String port = serverUrlController.value.text.split(":")[1];
+
+        setState(() {
+          // match the protocol in the controller to the provider
+          if (protocolController.value.text == "http://") {
+            ref.read(serverDetailsProvider.notifier).protocol = "http://";
+          } else {
+            ref.read(serverDetailsProvider.notifier).protocol = "https://";
+          }
+
+          ref.read(serverDetailsProvider.notifier).ipAddress = ipAddress;
+          ref.read(serverDetailsProvider.notifier).port = port;
+          ref.read(serverDetailsProvider.notifier).fullAddress =
+              "${ref.read(serverDetailsProvider.notifier).protocol}${serverUrlController.value.text}";
+          ref.read(serverDetailsProvider.notifier).username =
+              usernameController.value.text;
+          ref.read(serverDetailsProvider.notifier).password =
+              passwordController.value.text;
+
+          ref.watch(clientDetailsProvider.notifier).clientFromUsernamePassword(
+                url: ref.read(serverDetailsProvider.notifier).fullAddress,
+                username: usernameController.value.text,
+                password: passwordController.value.text,
+                ref: ref,
+              );
+          ref.watch(clientDetailsProvider.notifier).isLoggedIn = true;
+        });
+
+        await ref.read(serverDetailsProvider.notifier).saveData();
+      },
+      child: const Text("Login"),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Create a TextField Controller for the server URL input
-    final TextEditingController serverUrlController = TextEditingController();
-    final TextEditingController usernameController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
-    final JellyfinFactory jellyClient = ref.watch(jellyFactory.notifier);
+    if (!ref.read(clientDetailsProvider.notifier).isLoggedIn) {
+      ref.read(clientDetailsProvider.notifier).clientFromStorage();
+    }
 
     return Container(
       margin: const EdgeInsets.all(25),
@@ -93,151 +176,78 @@ class SettingsState extends ConsumerState<Settings> {
           // If logged in, make the background have a light-green color
           // Add padding on the color around the text
           loggedInStatusWidget(
-              isLoggedIn: ref.watch(jellyFactory.notifier).isLoggedIn,
-              username: ref
-                  .watch(server.usernameProvider.notifier)
-                  .username
-                  .toString()),
+              isLoggedIn: ref.read(clientDetailsProvider.notifier).isLoggedIn,
+              username: ref.read(serverDetailsProvider.notifier).username),
           // Drop-down widget with options "http://" and "https://"
-          Row(
-            children: <Widget>[
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                // onPressed: showPopupDialog,
-                onPressed: () {
-                  _showActionSheet(context);
-                },
-                child: Text(
-                  ref.watch(server.serverAddressProvider.notifier).protocol,
-                ),
-              ),
-              // Server URL input
-              Flexible(
-                child: Focus(
-                  onFocusChange: (hasFocus) async {
-                    if (!hasFocus) {
-                      String ipAddress = serverUrlController.text.split(":")[0];
-                      String port = serverUrlController.text.split(":")[1];
-                      ref
-                          .watch(server.serverAddressProvider.notifier)
-                          .ipAddress = ipAddress;
-                      ref.watch(server.serverAddressProvider.notifier).port =
-                          port;
-                      await storage.storeServerIP(ipAddress);
-                      await storage.storeServerPort(port);
-                    }
+          if (!ref.read(clientDetailsProvider.notifier).isLoggedIn)
+            Row(
+              children: <Widget>[
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    _showActionSheet(context);
                   },
+                  child: Text(protocolController.value.text == ""
+                      ? "http://"
+                      : "https://"),
+                ),
+                // Server URL input
+                Flexible(
                   child: CupertinoTextField(
-                      autocorrect: false,
-                      enableSuggestions: false,
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: CupertinoColors.systemGrey,
-                            width: 0.0, // One physical pixel.
-                            style: BorderStyle.solid,
-                          ),
+                    autocorrect: false,
+                    enableSuggestions: false,
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: CupertinoColors.systemGrey,
+                          width: 0.0, // One physical pixel.
+                          style: BorderStyle.solid,
                         ),
                       ),
-                      placeholder: "192.168.1.10",
-                      onChanged: (String value) {
-                        serverUrlController.text = value.toString();
-                      }),
-                ),
-              ),
-            ],
-          ),
-          // Username input
-          Flexible(
-            child: Focus(
-              onFocusChange: (hasFocus) async {
-                if (!hasFocus) {
-                  ref.watch(server.usernameProvider.notifier).username =
-                      usernameController.text;
-                  await storage.storeUsername(
-                      ref.watch(server.usernameProvider.notifier).username);
-                }
-              },
-              child: CupertinoTextField(
-                autocorrect: false,
-                enableSuggestions: false,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: CupertinoColors.systemGrey,
-                      width: 0.0, // One physical pixel.
-                      style: BorderStyle.solid,
                     ),
-                  ),
-                ),
-                placeholder: "Username",
-                onChanged: (String value) {
-                  usernameController.text = value.toString();
-                },
-              ),
-            ),
-          ),
-          Flexible(
-            child: Focus(
-              onFocusChange: (hasFocus) async {
-                if (!hasFocus) {
-                  ref.watch(server.passwordProvider.notifier).password =
-                      passwordController.text;
-                }
-              },
-              child: CupertinoTextField(
-                autocorrect: false,
-                obscureText: true,
-                enableSuggestions: false,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: CupertinoColors.systemGrey,
-                      width: 0.0, // One physical pixel.
-                      style: BorderStyle.solid,
-                    ),
-                  ),
-                ),
-                placeholder: "Password",
-                onChanged: (String value) {
-                  passwordController.text = value.toString();
-                },
-              ),
-            ),
-          ),
-          // A few pixel space between the input fields and the login button
-          Container(
-            margin: const EdgeInsets.only(top: 20),
-          ),
-          // Login button
-          CupertinoButton(
-            onPressed: () async {
-              await ref.watch(jellyFactory.notifier).build();
-              await ref.read(server.serverAddressProvider.notifier).saveData();
+                    placeholder: "192.168.1.10:8096",
+                    controller: serverUrlController,
+                    onChanged: (String value) {
+                      setState(() {
+                        if (value.isNotEmpty) {
+                          serverUrlController.text = value.toString();
+                          // Place the cursor at the end of the text
+                          serverUrlController.selection =
+                              TextSelection.fromPosition(TextPosition(
+                                  offset: serverUrlController.text.length));
 
-              setState(() {
-                ref.watch(jellyFactory.notifier).isLoggedIn = true;
-              });
-            },
-            child: const Text("Login"),
-          ),
-          Container(
-            margin: const EdgeInsets.only(top: 20),
-          ),
+                          if (value.contains(":")) {
+                            ref.read(serverDetailsProvider.notifier).ipAddress =
+                                value.split(":")[0];
+                            ref.read(serverDetailsProvider.notifier).port =
+                                value.split(":")[1];
+                          }
+                        }
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+          if (!ref.read(clientDetailsProvider.notifier).isLoggedIn)
+            Flexible(child: usernameTextField()),
+          if (!ref.read(clientDetailsProvider.notifier).isLoggedIn)
+            Flexible(child: passwordTextField()),
+          if (!ref.read(clientDetailsProvider.notifier).isLoggedIn)
+            Container(margin: const EdgeInsets.only(top: 20)),
+          if (!ref.read(clientDetailsProvider.notifier).isLoggedIn)
+            loginButton(),
+          if (!ref.read(clientDetailsProvider.notifier).isLoggedIn)
+            Container(margin: const EdgeInsets.only(top: 20)),
           CupertinoButton(
+            // Logout button
             color: Colors.red,
             onPressed: () async {
               await storage.clearStorage();
-              jellyClient.dio.options.headers =
-                  await jellyClient.dio.options.headers.remove("Token");
 
-              WidgetsBinding.instance
-                  .addPostFrameCallback((_) => setState(() async {
-                        await storage.clearStorage();
-                        ref.watch(jellyFactory.notifier).isLoggedIn = false;
-                      }));
               setState(() {
-                ref.watch(jellyFactory.notifier).isLoggedIn = false;
+                ref.read(clientDetailsProvider.notifier).logout();
+                ref.watch(serverDetailsProvider.notifier).logout();
               });
             },
             child: const Text("Logout"),
@@ -252,15 +262,18 @@ class SettingsState extends ConsumerState<Settings> {
               onPressed: () async {
                 if (kDebugMode) {
                   print("");
-                  print("Headers: ${jellyClient.dio.options.headers}");
+                  print(
+                      "Headers: ${ref.read(clientDetailsProvider.notifier).dio.options.headers}");
                   print("Username: ${await storage.getUsername()}");
-                  print("UserID: ${await storage.getUserID()}");
-                  print("Protocol: ${await storage.getServerProtocol()}");
-                  print("IP: ${await storage.getServerIP()}");
-                  print("Port: ${await storage.getServerPort()}");
+                  print("UserID: ${await storage.getUserId()}");
+                  print("Protocol: ${await storage.getProtocol()}");
+                  print("IP: ${await storage.getIP()}");
+                  print("Port: ${await storage.getPort()}");
                   print(
                       "Final Server Address: ${await storage.getFinalServerAddress()}");
                   print("Access Token: ${await storage.getAccessToken()}");
+                  print(
+                      "isLoggedIn: ${ref.read(clientDetailsProvider.notifier).isLoggedIn}");
                   print("");
                 }
               },

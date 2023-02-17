@@ -5,9 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellytics/models/cardWidget.dart';
 import 'package:jellytics/models/base.dart';
-import 'package:jellytics/providers/serverDetails.dart' as server;
+import 'package:jellytics/providers/serverDetails.dart';
 import 'package:jellytics/client/client.dart';
-import 'package:jellytics/utils/print.dart';
 import 'package:jellytics/widgets/library/item_detail.dart';
 
 class LibraryDetail extends ConsumerStatefulWidget {
@@ -23,26 +22,28 @@ class LibraryDetail extends ConsumerStatefulWidget {
   ConsumerState<LibraryDetail> createState() => LibraryDetailState();
 }
 
-class LibraryDetailState extends ConsumerState<LibraryDetail> {
+class LibraryDetailState extends ConsumerState<LibraryDetail>
+    with clientFromStorage {
   @override
   void initState() {
     super.initState();
+    initClient(ref);
   }
 
   Future<Widget> buildListItems() async {
+    // final serverDetails = ref.watch(server.serverDetailsProvider);
+
     Map<String, dynamic> libraryItemsJSON =
-        await ref.watch(jellyFactory.notifier).dio.get(
+        await ref.read(clientDetailsProvider.notifier).dio.get(
       "/Items",
       queryParameters: {
-        "userId": ref.watch(server.serverAddressProvider.notifier).userId,
+        "userId": ref.read(serverDetailsProvider.notifier).userId,
         "parentId": widget.libraryId,
         "sortOrder": "Ascending",
         "sortBy": "SortName",
         "fields": "Overview,Type,Path",
       },
     ).then((value) => value.data);
-
-    printAsJson(libraryItemsJSON);
 
     List<BaseModel> libraryItems = [];
     for (var i = 0; i < libraryItemsJSON["TotalRecordCount"]; i++) {
@@ -55,9 +56,9 @@ class LibraryDetailState extends ConsumerState<LibraryDetail> {
       String path = currentItem["Path"];
       ImagePaths imagePaths = ImagePaths(
         primary:
-            "${ref.watch(server.serverAddressProvider.notifier).fullAddress}/Items/$id/Images/Primary",
+            "${ref.read(serverDetailsProvider.notifier).fullAddress}/Items/$id/Images/Primary",
         backdrop:
-            "${ref.watch(server.serverAddressProvider.notifier).fullAddress}/Items/$id/Images/Backdrop",
+            "${ref.read(serverDetailsProvider.notifier).fullAddress}/Items/$id/Images/Backdrop",
       );
       BaseModel model = BaseModel(
         name: name,

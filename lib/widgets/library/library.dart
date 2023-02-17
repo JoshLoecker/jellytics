@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellytics/models/cardWidget.dart';
 import 'package:jellytics/client/client.dart';
 import 'package:jellytics/utils/storage.dart' as storage;
-import 'package:jellytics/providers/serverDetails.dart' as server;
+import 'package:jellytics/providers/serverDetails.dart';
 import 'package:jellytics/utils/interface.dart';
 import 'package:jellytics/widgets/library/library_detail.dart';
 
@@ -26,59 +27,36 @@ class Library extends ConsumerStatefulWidget {
   ConsumerState<Library> createState() => LibraryState();
 }
 
-class LibraryState extends ConsumerState<Library> {
+class LibraryState extends ConsumerState<Library> with clientFromStorage {
   // late final Future<int> numLibraries;
 
   @override
   void initState() {
     super.initState();
+    initClient(ref);
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   ref.watch(clientDetailsProvider.notifier).clientFromStorage();
+    // });
   }
 
-  Future<Widget> libraryListBuilder(bool isLoggedIn) async {
-    // If not logged in, return loggedInStatusWidget
-    if (!isLoggedIn) {
-      Widget col = Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          loggedInStatusWidget(isLoggedIn: false),
-          CupertinoButton(
-            onPressed: () async {
-              {
-                print("");
-                print(
-                    "Headers: ${ref.watch(jellyFactory.notifier).dio.options.headers}");
-                print("Username: ${await storage.getUsername()}");
-                print("UserID: ${await storage.getUserID()}");
-                print("Protocol: ${await storage.getServerProtocol()}");
-                print("IP: ${await storage.getServerIP()}");
-                print("Port: ${await storage.getServerPort()}");
-                print(
-                    "Final Server Address: ${await storage.getFinalServerAddress()}");
-                print("Access Token: ${await storage.getAccessToken()}");
-                print("");
-              }
-            },
-            child: const Text("Print SecureStorage"),
-          ),
-        ],
-      );
-      return col;
+  Future<Widget> libraryListBuilder() async {
+    if (ref.read(clientDetailsProvider.notifier).dio.options.baseUrl == "") {
+      ref.read(clientDetailsProvider.notifier).dio.options.baseUrl =
+          ref.read(serverDetailsProvider.notifier).fullAddress;
     }
 
-    String serverAddress =
-        ref.watch(server.serverAddressProvider.notifier).fullAddress;
-
     final Map<String, dynamic> libraryJSON = await ref
-        .watch(jellyFactory.notifier)
+        .read(clientDetailsProvider.notifier)
         .dio
         .get("/Items", queryParameters: {
-      "userId": ref.watch(server.serverAddressProvider.notifier).userId,
+      "userId": ref.read(serverDetailsProvider.notifier).userId,
     }).then((value) => value.data);
 
-    return ListView(
-      children: <Widget>[
-        for (var i = 0; i < libraryJSON["TotalRecordCount"]; i++)
-          cardContainer(
+    return ListView.builder(
+        itemCount: libraryJSON["TotalRecordCount"],
+        scrollDirection: Axis.vertical,
+        itemBuilder: (BuildContext context, int index) {
+          return cardContainer(
             Material(
               child: InkWell(
                 onTap: () {
@@ -86,8 +64,8 @@ class LibraryState extends ConsumerState<Library> {
                     context,
                     CupertinoPageRoute(
                       builder: (context) => LibraryDetail(
-                        libraryName: libraryJSON["Items"][i]["Name"],
-                        libraryId: libraryJSON["Items"][i]["Id"],
+                        libraryName: libraryJSON["Items"][index]["Name"],
+                        libraryId: libraryJSON["Items"][index]["Id"],
                       ),
                     ),
                   );
@@ -97,40 +75,92 @@ class LibraryState extends ConsumerState<Library> {
                     borderRadius: BorderRadius.circular(10),
                     image: DecorationImage(
                       image: NetworkImage(
-                          "$serverAddress/Items/${libraryJSON['Items'][i]['Id']}/Images/Primary"),
+                          "${ref.read(serverDetailsProvider.notifier).fullAddress}/Items/${libraryJSON['Items'][index]['Id']}/Images/Primary"),
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-      ],
-    );
+          );
+        });
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isLoggedIn = ref.watch(jellyFactory.notifier).isLoggedIn;
+    // ref.watch(clientDetailsProvider.notifier).clientFromStorage();
+    final server = ref.watch(serverDetailsProvider);
+    final client = ref.watch(clientDetailsProvider);
 
-    return FutureBuilder(
-      future: libraryListBuilder(isLoggedIn),
-      initialData: const Center(child: CupertinoActivityIndicator()),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-            return const Text("No connection");
-          case ConnectionState.waiting:
-          case ConnectionState.active:
-            return const Center(child: CupertinoActivityIndicator());
-          case ConnectionState.done:
-            if (snapshot.hasError) {
-              return Text("Error: ${snapshot.error}");
-            } else {
-              return snapshot.data;
-            }
-        }
-      },
-    );
+    if (!ref.read(clientDetailsProvider.notifier).isLoggedIn) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          loggedInStatusWidget(isLoggedIn: false),
+          if (kDebugMode)
+            CupertinoButton(
+              onPressed: () async {
+                {
+                  print("");
+                  print(
+                      "Headers: ${ref.read(clientDetailsProvider.notifier).dio.options.headers}");
+                  print("Username: ${await storage.getUsername()}");
+                  print("UserID: ${await storage.getUserId()}");
+                  print("Protocol: ${await storage.getProtocol()}");
+                  print("IP: ${await storage.getIP()}");
+                  print("Port: ${await storage.getPort()}");
+                  print(
+                      "Final Server Address: ${await storage.getFinalServerAddress()}");
+                  print("Access Token: ${await storage.getAccessToken()}");
+                  print("");
+                }
+              },
+              child: const Text("Print SecureStorage"),
+            ),
+        ],
+      );
+    } else {
+      return FutureBuilder(
+        future: libraryListBuilder(),
+        initialData: const Center(child: CupertinoActivityIndicator()),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              return const Text("No connection");
+            case ConnectionState.waiting:
+            case ConnectionState.active:
+              return Column(children: <Widget>[
+                const Center(child: CupertinoActivityIndicator()),
+                CupertinoButton(
+                  onPressed: () async {
+                    if (kDebugMode) {
+                      print("");
+                      print(
+                          "Headers: ${ref.read(clientDetailsProvider.notifier).dio.options.headers}");
+                      print("Username: ${await storage.getUsername()}");
+                      print("UserID: ${await storage.getUserId()}");
+                      print("Protocol: ${await storage.getProtocol()}");
+                      print("IP: ${await storage.getIP()}");
+                      print("Port: ${await storage.getPort()}");
+                      print(
+                          "Final Server Address: ${await storage.getFinalServerAddress()}");
+                      print("Access Token: ${await storage.getAccessToken()}");
+                      print("");
+                    }
+                  },
+                  child: const Text("Print SecureStorage"),
+                ),
+              ]);
+            case ConnectionState.done:
+              if (snapshot.hasError) {
+                return Text("Error: ${snapshot.error}");
+              } else {
+                return snapshot.data;
+              }
+          }
+        },
+      );
+    }
   }
 }

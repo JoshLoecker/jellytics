@@ -1,102 +1,142 @@
-import 'dart:async';
-import 'package:dio/dio.dart';
+// Freezed
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jellytics/utils/storage.dart' as storage;
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:jellytics/providers/serverDetails.dart';
 
-class JellyfinFactory extends AsyncNotifier<JellyfinFactory> {
-  Dio dio = Dio();
-  bool isLoggedIn = false;
-  String username = "";
+// Riverpod
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-  static Dio _defaultDio() {
-    Dio dio = Dio();
-    dio.options.headers = {
-      "Content-Type": "application/json",
-      "x-emby-authorization":
-          "MediaBrowser , Client='Jellytics', Device='Jellytics', DeviceId='script', Version='0.0.1'"
-    };
-    return dio;
+// Additional imports
+import 'dart:async';
+import 'package:dio/dio.dart';
+import 'package:jellytics/utils/storage.dart' as storage;
+
+part 'client.freezed.dart';
+part 'client.g.dart';
+
+@freezed
+class ClientData with _$ClientData {
+  factory ClientData({
+    required Dio dio,
+    required bool isLoggedIn,
+    required String username,
+    required String userId,
+  }) = _ClientData;
+}
+
+@riverpod
+class ClientDetails extends _$ClientDetails {
+  Dio dio = Dio(_getDefaultOptions());
+  String get userId => state.userId;
+  bool get isLoggedIn => state.isLoggedIn;
+
+  set isLoggedIn(bool isLoggedIn_) {
+    state = state.copyWith(isLoggedIn: isLoggedIn_);
   }
 
-  static Future<Dio> clientFromStorage() async {
-    Dio dio = _defaultDio();
+  static BaseOptions _getDefaultOptions() {
+    return BaseOptions(
+      headers: {
+        "Content-Type": "application/json",
+        "x-emby-authorization":
+            "MediaBrowser , Client='Jellytics', Device='Jellytics', DeviceId='script', Version='0.0.1'"
+      },
+    );
+  }
+
+  @override
+  ClientData build() {
+    return ClientData(
+      dio: dio,
+      isLoggedIn: false,
+      username: "",
+      userId: "",
+    );
+  }
+
+  Future<void> clientFromStorage() async {
+    String protocol = await storage.getProtocol();
+    String ipAddress = await storage.getIP();
+    String port = await storage.getPort();
     String accessToken = await storage.getAccessToken();
-    dio.options.headers["x-emby-authorization"] += ", Token=$accessToken";
-    dio.options.baseUrl = await storage.getFinalServerAddress();
-    return dio;
+    String username = await storage.getUsername();
+
+    if (ipAddress != "" && port != "") {
+      ref.read(serverDetailsProvider.notifier).protocol = protocol;
+      ref.read(serverDetailsProvider.notifier).ipAddress = ipAddress;
+      ref.read(serverDetailsProvider.notifier).port = port;
+      ref.read(serverDetailsProvider.notifier).fullAddress =
+          "$protocol$ipAddress:$port";
+    }
+    if (username != "") {
+      ref.read(serverDetailsProvider.notifier).username = username;
+      ref.read(serverDetailsProvider.notifier).userId =
+          await storage.getUserId();
+    }
+
+    if (!state.dio.options.headers["x-emby-authorization"]
+        .toString()
+        .contains(accessToken)) {
+      Dio newDio = state.dio;
+      newDio.options.headers["x-emby-authorization"] += ", Token=$accessToken";
+      state = state.copyWith(
+        dio: newDio,
+        isLoggedIn: true,
+        username: username,
+        userId: await storage.getUserId(),
+      );
+    }
   }
 
-  static Future<Dio> getAccessTokenFromUsernamePassword(
-      {required String url,
-      required String username,
-      required String password}) async {
-    Dio dio = _defaultDio();
-    dio.options.baseUrl = url;
+  Future<void> clientFromUsernamePassword({
+    required String url,
+    required String username,
+    required String password,
+    required WidgetRef ref,
+  }) async {
+    Dio internalDio = Dio(_getDefaultOptions());
+    internalDio.options.baseUrl = url;
 
-    final result = await dio.post(
+    final result = await internalDio.post(
       "/Users/AuthenticateByName",
       data: {"Username": username, "Pw": password},
     );
 
-    dio.options.headers["x-emby-authorization"] +=
-        ", Token=${result.data["AccessToken"]}";
-
     await storage.storeAccessToken(result.data["AccessToken"]);
-    await storage.storeUserID(result.data["User"]["Id"]);
+    await storage.storeUserId(result.data["User"]["Id"]);
+    await storage.storeUsername(username);
 
-    return dio;
+    internalDio.options.headers["x-emby-authorization"] +=
+        ", Token=${result.data["AccessToken"]}";
+    ref.watch(serverDetailsProvider.notifier).accessToken =
+        result.data["AccessToken"];
+    ref.watch(serverDetailsProvider.notifier).userId =
+        result.data["User"]["Id"];
+
+    ref.watch(clientDetailsProvider.notifier).dio = internalDio;
+    state = state.copyWith(
+      dio: internalDio,
+      isLoggedIn: true,
+      username: username,
+      userId: ref.watch(serverDetailsProvider.notifier).userId,
+    );
   }
 
-  static Future<Dio> getAccessTokenFromStorage() async {
-    Dio dio = _defaultDio();
-    String accessToken = await storage.getAccessToken();
-    dio.options.headers["x-emby-authorization"] += ", Token=$accessToken";
-    dio.options.baseUrl = await storage.getFinalServerAddress();
-    return dio;
-  }
-
-  @override
-  Future<JellyfinFactory> build() async {
-    JellyfinFactory factory = JellyfinFactory();
-
-    String protocol = ref.watch(serverAddressProvider.notifier).protocol;
-    String ipAddress = ref.watch(serverAddressProvider.notifier).ipAddress;
-    String port = ref.watch(serverAddressProvider.notifier).port;
-    username = ref.watch(usernameProvider.notifier).username;
-    String password = ref.watch(passwordProvider.notifier).password;
-    late Dio internalDio;
-
-    if (await storage.getAccessToken() == "" ||
-        await storage.getUserID() == "") {
-      internalDio = await JellyfinFactory.getAccessTokenFromUsernamePassword(
-        url: "$protocol$ipAddress:$port",
-        username: username,
-        password: password,
-      );
-    } else {
-      internalDio = await JellyfinFactory.getAccessTokenFromStorage();
-    }
-
-    dio.options = internalDio.options;
-    dio.httpClientAdapter = internalDio.httpClientAdapter;
-    dio.transformer = internalDio.transformer;
-
-    ref.watch(serverAddressProvider.notifier).userId =
-        await storage.getUserID();
-    isLoggedIn = true;
-
-    return factory;
+  void logout() {
+    state = state.copyWith(
+      dio: Dio(_getDefaultOptions()),
+      isLoggedIn: false,
+      username: "",
+      userId: "",
+    );
   }
 }
 
-// Extend JellyfinFactory with a new method called "getImages"
-extension JellyfinFactoryImages on JellyfinFactory {
-  Future<dynamic> getImages(String itemId) async {
-    final result = await dio.get("/Items/$itemId/Images/Primary");
-    return result.data;
+mixin clientFromStorage {
+  void initClient(WidgetRef ref) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.watch(clientDetailsProvider.notifier).clientFromStorage();
+    });
   }
 }
-
-final jellyFactory = AsyncNotifierProvider<JellyfinFactory, JellyfinFactory>(
-    JellyfinFactory.new);
