@@ -34,7 +34,7 @@ Widget loggedInStatusWidget({required bool isLoggedIn, String? username}) {
       borderRadius: BorderRadius.circular(5),
     ),
     child: Text(
-      isLoggedIn ? "Logged in as $username" : "Not logged in",
+      isLoggedIn ? "Logged in!" : "Not logged in",
       style: const TextStyle(
         fontSize: 20,
       ),

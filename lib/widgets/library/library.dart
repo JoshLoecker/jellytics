@@ -88,9 +88,8 @@ class LibraryState extends ConsumerState<Library> with clientFromStorage {
 
   @override
   Widget build(BuildContext context) {
-    // ref.watch(clientDetailsProvider.notifier).clientFromStorage();
-    final server = ref.watch(serverDetailsProvider);
-    final client = ref.watch(clientDetailsProvider);
+    ref.watch(serverDetailsProvider.notifier);
+    ref.watch(clientDetailsProvider.notifier);
 
     if (!ref.read(clientDetailsProvider.notifier).isLoggedIn) {
       return Column(
@@ -102,18 +101,20 @@ class LibraryState extends ConsumerState<Library> with clientFromStorage {
             CupertinoButton(
               onPressed: () async {
                 {
-                  print("");
-                  print(
-                      "Headers: ${ref.read(clientDetailsProvider.notifier).dio.options.headers}");
-                  print("Username: ${await storage.getUsername()}");
-                  print("UserID: ${await storage.getUserId()}");
-                  print("Protocol: ${await storage.getProtocol()}");
-                  print("IP: ${await storage.getIP()}");
-                  print("Port: ${await storage.getPort()}");
-                  print(
-                      "Final Server Address: ${await storage.getFinalServerAddress()}");
-                  print("Access Token: ${await storage.getAccessToken()}");
-                  print("");
+                  if (kDebugMode) {
+                    print("");
+                    print(
+                        "Headers: ${ref.read(clientDetailsProvider.notifier).dio.options.headers}");
+                    print("Username: ${await storage.getUsername()}");
+                    print("UserID: ${await storage.getUserId()}");
+                    print("Protocol: ${await storage.getProtocol()}");
+                    print("IP: ${await storage.getIP()}");
+                    print("Port: ${await storage.getPort()}");
+                    print(
+                        "Final Server Address: ${await storage.getFinalServerAddress()}");
+                    print("Access Token: ${await storage.getAccessToken()}");
+                    print("");
+                  }
                 }
               },
               child: const Text("Print SecureStorage"),

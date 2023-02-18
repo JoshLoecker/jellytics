@@ -61,7 +61,9 @@ class ClientDetails extends _$ClientDetails {
     String port = await storage.getPort();
     String accessToken = await storage.getAccessToken();
     String username = await storage.getUsername();
+    String userId = await storage.getUserId();
 
+    // If the IP address and port are not empty, set the server details
     if (ipAddress != "" && port != "") {
       ref.read(serverDetailsProvider.notifier).protocol = protocol;
       ref.read(serverDetailsProvider.notifier).ipAddress = ipAddress;
@@ -69,27 +71,33 @@ class ClientDetails extends _$ClientDetails {
       ref.read(serverDetailsProvider.notifier).fullAddress =
           "$protocol$ipAddress:$port";
     }
+
+    // If the username is not empty, set it
     if (username != "") {
       ref.read(serverDetailsProvider.notifier).username = username;
-      ref.read(serverDetailsProvider.notifier).userId =
-          await storage.getUserId();
     }
 
-    if (!state.dio.options.headers["x-emby-authorization"]
-        .toString()
-        .contains(accessToken)) {
+    // If the user ID is not empty, set it
+    if (userId != "") {
+      ref.read(serverDetailsProvider.notifier).userId = userId;
+    }
+
+    // If the access token is not empty, set it
+    if (accessToken != "") {
+      ref.read(serverDetailsProvider.notifier).accessToken = accessToken;
+
       Dio newDio = state.dio;
       newDio.options.headers["x-emby-authorization"] += ", Token=$accessToken";
       state = state.copyWith(
         dio: newDio,
         isLoggedIn: true,
-        username: username,
+        username: await storage.getUsername(),
         userId: await storage.getUserId(),
       );
     }
   }
 
-  Future<void> clientFromUsernamePassword({
+  Future<bool> clientFromUsernamePassword({
     required String url,
     required String username,
     required String password,
@@ -121,6 +129,12 @@ class ClientDetails extends _$ClientDetails {
       username: username,
       userId: ref.watch(serverDetailsProvider.notifier).userId,
     );
+
+    if (result.data["AccessToken"] != null) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   void logout() {

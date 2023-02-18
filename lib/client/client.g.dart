@@ -29,7 +29,7 @@ class _SystemHash {
   }
 }
 
-String _$ClientDetailsHash() => r'60615701639f0f325b863f09a97683d7656b97be';
+String _$ClientDetailsHash() => r'961f68e94b4ba398011e28bf2f5d7c3e0177e4f3';
 
 /// See also [ClientDetails].
 final clientDetailsProvider =

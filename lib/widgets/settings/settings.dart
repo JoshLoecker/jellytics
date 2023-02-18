@@ -35,6 +35,7 @@ class SettingsState extends ConsumerState<Settings> with clientFromStorage {
   void initState() {
     super.initState();
     initClient(ref);
+    protocolController.text = "http://";
   }
 
   void _showActionSheet(BuildContext context) {
@@ -125,36 +126,42 @@ class SettingsState extends ConsumerState<Settings> with clientFromStorage {
   CupertinoButton loginButton() {
     return CupertinoButton(
       onPressed: () async {
-        String ipAddress = serverUrlController.value.text.split(":")[0];
-        String port = serverUrlController.value.text.split(":")[1];
-
-        setState(() {
-          // match the protocol in the controller to the provider
-          if (protocolController.value.text == "http://") {
-            ref.read(serverDetailsProvider.notifier).protocol = "http://";
-          } else {
-            ref.read(serverDetailsProvider.notifier).protocol = "https://";
-          }
-
-          ref.read(serverDetailsProvider.notifier).ipAddress = ipAddress;
-          ref.read(serverDetailsProvider.notifier).port = port;
-          ref.read(serverDetailsProvider.notifier).fullAddress =
-              "${ref.read(serverDetailsProvider.notifier).protocol}${serverUrlController.value.text}";
-          ref.read(serverDetailsProvider.notifier).username =
-              usernameController.value.text;
-          ref.read(serverDetailsProvider.notifier).password =
-              passwordController.value.text;
-
-          ref.watch(clientDetailsProvider.notifier).clientFromUsernamePassword(
-                url: ref.read(serverDetailsProvider.notifier).fullAddress,
-                username: usernameController.value.text,
-                password: passwordController.value.text,
-                ref: ref,
-              );
-          ref.watch(clientDetailsProvider.notifier).isLoggedIn = true;
+        bool isLoggedIn = await ref
+            .watch(clientDetailsProvider.notifier)
+            .clientFromUsernamePassword(
+              url:
+                  "${protocolController.value.text}${serverUrlController.value.text}",
+              username: usernameController.value.text,
+              password: passwordController.value.text,
+              ref: ref,
+            )
+            .then((result) {
+          result == true
+              ? ref.read(serverDetailsProvider.notifier).saveData()
+              : {};
+          return result;
         });
 
-        await ref.read(serverDetailsProvider.notifier).saveData();
+        if (isLoggedIn) {
+          await ref.read(serverDetailsProvider.notifier).saveData();
+        }
+
+        setState(() {
+          if (isLoggedIn) {
+            ref.watch(clientDetailsProvider.notifier).isLoggedIn = true;
+            // Set login details
+            ref.read(serverDetailsProvider.notifier).protocol =
+                protocolController.value.text;
+            ref.read(serverDetailsProvider.notifier).ipAddress =
+                serverUrlController.value.text.split(":")[0];
+            ref.read(serverDetailsProvider.notifier).port =
+                serverUrlController.value.text.split(":")[1];
+            ref.read(serverDetailsProvider.notifier).fullAddress =
+                "${protocolController.value.text}${serverUrlController.value.text}";
+            ref.read(serverDetailsProvider.notifier).username =
+                usernameController.value.text;
+          }
+        });
       },
       child: const Text("Login"),
     );
@@ -162,10 +169,7 @@ class SettingsState extends ConsumerState<Settings> with clientFromStorage {
 
   @override
   Widget build(BuildContext context) {
-    if (!ref.read(clientDetailsProvider.notifier).isLoggedIn) {
-      ref.read(clientDetailsProvider.notifier).clientFromStorage();
-    }
-
+    ref.watch(clientDetailsProvider.notifier);
     return Container(
       margin: const EdgeInsets.all(25),
       child: Column(
@@ -176,10 +180,10 @@ class SettingsState extends ConsumerState<Settings> with clientFromStorage {
           // If logged in, make the background have a light-green color
           // Add padding on the color around the text
           loggedInStatusWidget(
-              isLoggedIn: ref.read(clientDetailsProvider.notifier).isLoggedIn,
-              username: ref.read(serverDetailsProvider.notifier).username),
+              isLoggedIn: ref.watch(clientDetailsProvider.notifier).isLoggedIn,
+              username: ref.watch(serverDetailsProvider.notifier).username),
           // Drop-down widget with options "http://" and "https://"
-          if (!ref.read(clientDetailsProvider.notifier).isLoggedIn)
+          if (!ref.watch(clientDetailsProvider.notifier).isLoggedIn)
             Row(
               children: <Widget>[
                 CupertinoButton(
@@ -187,9 +191,7 @@ class SettingsState extends ConsumerState<Settings> with clientFromStorage {
                   onPressed: () {
                     _showActionSheet(context);
                   },
-                  child: Text(protocolController.value.text == ""
-                      ? "http://"
-                      : "https://"),
+                  child: Text(protocolController.value.text),
                 ),
                 // Server URL input
                 Flexible(
@@ -229,15 +231,15 @@ class SettingsState extends ConsumerState<Settings> with clientFromStorage {
                 ),
               ],
             ),
-          if (!ref.read(clientDetailsProvider.notifier).isLoggedIn)
+          if (!ref.watch(clientDetailsProvider.notifier).isLoggedIn)
             Flexible(child: usernameTextField()),
-          if (!ref.read(clientDetailsProvider.notifier).isLoggedIn)
+          if (!ref.watch(clientDetailsProvider.notifier).isLoggedIn)
             Flexible(child: passwordTextField()),
-          if (!ref.read(clientDetailsProvider.notifier).isLoggedIn)
+          if (!ref.watch(clientDetailsProvider.notifier).isLoggedIn)
             Container(margin: const EdgeInsets.only(top: 20)),
-          if (!ref.read(clientDetailsProvider.notifier).isLoggedIn)
+          if (!ref.watch(clientDetailsProvider.notifier).isLoggedIn)
             loginButton(),
-          if (!ref.read(clientDetailsProvider.notifier).isLoggedIn)
+          if (!ref.watch(clientDetailsProvider.notifier).isLoggedIn)
             Container(margin: const EdgeInsets.only(top: 20)),
           CupertinoButton(
             // Logout button
@@ -246,7 +248,7 @@ class SettingsState extends ConsumerState<Settings> with clientFromStorage {
               await storage.clearStorage();
 
               setState(() {
-                ref.read(clientDetailsProvider.notifier).logout();
+                ref.watch(clientDetailsProvider.notifier).logout();
                 ref.watch(serverDetailsProvider.notifier).logout();
               });
             },

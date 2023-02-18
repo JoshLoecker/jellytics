@@ -21,7 +21,6 @@ class ServerData with _$ServerData {
     required String userId,
     required String username,
     required String accessToken,
-    required String password,
   }) = _ServerData;
 }
 
@@ -37,7 +36,6 @@ class ServerDetails extends _$ServerDetails {
       userId: "",
       username: "",
       accessToken: "",
-      password: "",
     );
   }
 
@@ -70,10 +68,6 @@ class ServerDetails extends _$ServerDetails {
     state = state.copyWith(accessToken: accessToken);
   }
 
-  set password(String password) {
-    state = state.copyWith(password: password);
-  }
-
   // ----- Getters -----
   String get protocol => state.protocol;
   String get ipAddress => state.ipAddress;
@@ -93,7 +87,6 @@ class ServerDetails extends _$ServerDetails {
       userId: "",
       username: "",
       accessToken: "",
-      password: "",
     );
   }
 

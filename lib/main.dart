@@ -36,6 +36,9 @@ class _StatefulApp extends ConsumerState<HomePage> {
   void initState() {
     super.initState();
     if (!kIsWeb) FlutterNativeSplash.remove();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      ref.watch(clientDetailsProvider.notifier).clientFromStorage();
+    });
   }
 
   // This is a list of items that are being provided as the "content" widgets.

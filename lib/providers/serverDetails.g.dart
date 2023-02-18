@@ -29,7 +29,7 @@ class _SystemHash {
   }
 }
 
-String _$ServerDetailsHash() => r'fbd0d3e77fd64a7010b39887e9ff2741a7750c0d';
+String _$ServerDetailsHash() => r'bcd4fdd13bec759b491493f8084b4134a23f1fe8';
 
 /// See also [ServerDetails].
 final serverDetailsProvider =

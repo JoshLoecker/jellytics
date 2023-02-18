@@ -23,7 +23,6 @@ mixin _$ServerData {
   String get userId => throw _privateConstructorUsedError;
   String get username => throw _privateConstructorUsedError;
   String get accessToken => throw _privateConstructorUsedError;
-  String get password => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $ServerDataCopyWith<ServerData> get copyWith =>
@@ -43,8 +42,7 @@ abstract class $ServerDataCopyWith<$Res> {
       String fullAddress,
       String userId,
       String username,
-      String accessToken,
-      String password});
+      String accessToken});
 }
 
 /// @nodoc
@@ -67,7 +65,6 @@ class _$ServerDataCopyWithImpl<$Res, $Val extends ServerData>
     Object? userId = null,
     Object? username = null,
     Object? accessToken = null,
-    Object? password = null,
   }) {
     return _then(_value.copyWith(
       protocol: null == protocol
@@ -98,10 +95,6 @@ class _$ServerDataCopyWithImpl<$Res, $Val extends ServerData>
           ? _value.accessToken
           : accessToken // ignore: cast_nullable_to_non_nullable
               as String,
-      password: null == password
-          ? _value.password
-          : password // ignore: cast_nullable_to_non_nullable
-              as String,
     ) as $Val);
   }
 }
@@ -121,8 +114,7 @@ abstract class _$$_ServerDataCopyWith<$Res>
       String fullAddress,
       String userId,
       String username,
-      String accessToken,
-      String password});
+      String accessToken});
 }
 
 /// @nodoc
@@ -143,7 +135,6 @@ class __$$_ServerDataCopyWithImpl<$Res>
     Object? userId = null,
     Object? username = null,
     Object? accessToken = null,
-    Object? password = null,
   }) {
     return _then(_$_ServerData(
       protocol: null == protocol
@@ -174,10 +165,6 @@ class __$$_ServerDataCopyWithImpl<$Res>
           ? _value.accessToken
           : accessToken // ignore: cast_nullable_to_non_nullable
               as String,
-      password: null == password
-          ? _value.password
-          : password // ignore: cast_nullable_to_non_nullable
-              as String,
     ));
   }
 }
@@ -192,8 +179,7 @@ class _$_ServerData with DiagnosticableTreeMixin implements _ServerData {
       required this.fullAddress,
       required this.userId,
       required this.username,
-      required this.accessToken,
-      required this.password});
+      required this.accessToken});
 
   @override
   final String protocol;
@@ -209,12 +195,10 @@ class _$_ServerData with DiagnosticableTreeMixin implements _ServerData {
   final String username;
   @override
   final String accessToken;
-  @override
-  final String password;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ServerData(protocol: $protocol, ipAddress: $ipAddress, port: $port, fullAddress: $fullAddress, userId: $userId, username: $username, accessToken: $accessToken, password: $password)';
+    return 'ServerData(protocol: $protocol, ipAddress: $ipAddress, port: $port, fullAddress: $fullAddress, userId: $userId, username: $username, accessToken: $accessToken)';
   }
 
   @override
@@ -228,8 +212,7 @@ class _$_ServerData with DiagnosticableTreeMixin implements _ServerData {
       ..add(DiagnosticsProperty('fullAddress', fullAddress))
       ..add(DiagnosticsProperty('userId', userId))
       ..add(DiagnosticsProperty('username', username))
-      ..add(DiagnosticsProperty('accessToken', accessToken))
-      ..add(DiagnosticsProperty('password', password));
+      ..add(DiagnosticsProperty('accessToken', accessToken));
   }
 
   @override
@@ -248,14 +231,12 @@ class _$_ServerData with DiagnosticableTreeMixin implements _ServerData {
             (identical(other.username, username) ||
                 other.username == username) &&
             (identical(other.accessToken, accessToken) ||
-                other.accessToken == accessToken) &&
-            (identical(other.password, password) ||
-                other.password == password));
+                other.accessToken == accessToken));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, protocol, ipAddress, port,
-      fullAddress, userId, username, accessToken, password);
+      fullAddress, userId, username, accessToken);
 
   @JsonKey(ignore: true)
   @override
@@ -272,8 +253,7 @@ abstract class _ServerData implements ServerData {
       required final String fullAddress,
       required final String userId,
       required final String username,
-      required final String accessToken,
-      required final String password}) = _$_ServerData;
+      required final String accessToken}) = _$_ServerData;
 
   @override
   String get protocol;
@@ -289,8 +269,6 @@ abstract class _ServerData implements ServerData {
   String get username;
   @override
   String get accessToken;
-  @override
-  String get password;
   @override
   @JsonKey(ignore: true)
   _$$_ServerDataCopyWith<_$_ServerData> get copyWith =>
