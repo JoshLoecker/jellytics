@@ -123,47 +123,51 @@ class SettingsState extends ConsumerState<Settings> with clientFromStorage {
     );
   }
 
-  CupertinoButton loginButton() {
-    return CupertinoButton(
-      onPressed: () async {
-        bool isLoggedIn = await ref
-            .watch(clientDetailsProvider.notifier)
-            .clientFromUsernamePassword(
-              url:
-                  "${protocolController.value.text}${serverUrlController.value.text}",
-              username: usernameController.value.text,
-              password: passwordController.value.text,
-              ref: ref,
-            )
-            .then((result) {
-          result == true
-              ? ref.read(serverDetailsProvider.notifier).saveData()
-              : {};
-          return result;
-        });
+  Widget loginButton() {
+    return SizedBox(
+      width: 185,
+      height: 75,
+      child: CupertinoButton.filled(
+        onPressed: () async {
+          bool isLoggedIn = await ref
+              .watch(clientDetailsProvider.notifier)
+              .clientFromUsernamePassword(
+                url:
+                    "${protocolController.value.text}${serverUrlController.value.text}",
+                username: usernameController.value.text,
+                password: passwordController.value.text,
+                ref: ref,
+              )
+              .then((result) {
+            result == true
+                ? ref.read(serverDetailsProvider.notifier).saveData()
+                : {};
+            return result;
+          });
 
-        if (isLoggedIn) {
-          await ref.read(serverDetailsProvider.notifier).saveData();
-        }
-
-        setState(() {
           if (isLoggedIn) {
-            ref.watch(clientDetailsProvider.notifier).isLoggedIn = true;
-            // Set login details
-            ref.read(serverDetailsProvider.notifier).protocol =
-                protocolController.value.text;
-            ref.read(serverDetailsProvider.notifier).ipAddress =
-                serverUrlController.value.text.split(":")[0];
-            ref.read(serverDetailsProvider.notifier).port =
-                serverUrlController.value.text.split(":")[1];
-            ref.read(serverDetailsProvider.notifier).fullAddress =
-                "${protocolController.value.text}${serverUrlController.value.text}";
-            ref.read(serverDetailsProvider.notifier).username =
-                usernameController.value.text;
+            await ref.read(serverDetailsProvider.notifier).saveData();
           }
-        });
-      },
-      child: const Text("Login"),
+
+          setState(() {
+            if (isLoggedIn) {
+              ref.watch(clientDetailsProvider.notifier).isLoggedIn = true;
+              // Set login details
+              ref.read(serverDetailsProvider.notifier).protocol =
+                  protocolController.value.text;
+              ref.read(serverDetailsProvider.notifier).ipAddress =
+                  serverUrlController.value.text.split(":")[0];
+              ref.read(serverDetailsProvider.notifier).port =
+                  serverUrlController.value.text.split(":")[1];
+              ref.read(serverDetailsProvider.notifier).fullAddress =
+                  "${protocolController.value.text}${serverUrlController.value.text}";
+              ref.read(serverDetailsProvider.notifier).username =
+                  usernameController.value.text;
+            }
+          });
+        },
+        child: const Text("Login"),
+      ),
     );
   }
 
@@ -241,18 +245,21 @@ class SettingsState extends ConsumerState<Settings> with clientFromStorage {
             loginButton(),
           if (!ref.watch(clientDetailsProvider.notifier).isLoggedIn)
             Container(margin: const EdgeInsets.only(top: 20)),
-          CupertinoButton(
-            // Logout button
-            color: Colors.red,
-            onPressed: () async {
-              await storage.clearStorage();
+          SizedBox(
+            width: 185,
+            child: CupertinoButton(
+              // Logout button
+              color: Colors.red,
+              onPressed: () async {
+                await storage.clearStorage();
 
-              setState(() {
-                ref.watch(clientDetailsProvider.notifier).logout();
-                ref.watch(serverDetailsProvider.notifier).logout();
-              });
-            },
-            child: const Text("Logout"),
+                setState(() {
+                  ref.watch(clientDetailsProvider.notifier).logout();
+                  ref.watch(serverDetailsProvider.notifier).logout();
+                });
+              },
+              child: const Text("Logout"),
+            ),
           ),
           // Show a button if in debug mode
           if (kDebugMode)

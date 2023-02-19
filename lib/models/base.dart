@@ -1,3 +1,6 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 class ImagePaths {
   late String primary;
   late String art;
@@ -49,4 +52,44 @@ class BaseModel {
       required this.type,
       required this.overview,
       required this.imagePaths});
+}
+
+Row rowItem(String title, String value) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: <Widget>[
+            textPadding(title, makeGrey: true),
+          ],
+        ),
+      ),
+      const SizedBox(width: 10),
+      Flexible(
+        flex: 2,
+        child: Column(
+          children: <Widget>[
+            textPadding(value, makeGrey: false),
+          ],
+        ),
+      ),
+      const SizedBox(width: 20),
+    ],
+  );
+}
+
+Padding textPadding(String text, {bool makeGrey = false, double? textSize}) {
+  if (makeGrey) {
+    return Padding(
+      padding: const EdgeInsets.all(5),
+      child: Text(text, style: const TextStyle(color: Colors.grey)),
+    );
+  } else {
+    return Padding(
+      padding: const EdgeInsets.all(5),
+      child: Text(text),
+    );
+  }
 }
