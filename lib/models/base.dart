@@ -1,11 +1,10 @@
 /// This file contains the base model for all media types
 /// Calling the 'build' method will return a widget based on the type of media
 
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jellytics/models/movie.dart';
-import 'package:jellytics/models/series.dart';
+import 'package:jellytics/models/types/movie.dart';
+import 'package:jellytics/models/types/series.dart';
 
 class ImagePaths {
   late String primary;
@@ -22,21 +21,24 @@ class ImagePaths {
   late String boxRear;
   late String profile;
 
-  ImagePaths({
-    this.primary = "",
-    this.art = "",
-    this.backdrop = "",
-    this.banner = "",
-    this.logo = "",
-    this.thumb = "",
-    this.disc = "",
-    this.box = "",
-    this.screenshot = "",
-    this.menu = "",
-    this.chapter = "",
-    this.boxRear = "",
-    this.profile = "",
-  });
+  ImagePaths(
+    String fullIPAddress,
+    String id,
+  ) {
+    primary = "$fullIPAddress/Items/$id/Images/Primary";
+    art = "$fullIPAddress/Items/$id/Images/Art";
+    backdrop = "$fullIPAddress/Items/$id/Images/Backdrop";
+    banner = "$fullIPAddress/Items/$id/Images/Banner";
+    logo = "$fullIPAddress/Items/$id/Images/Logo";
+    thumb = "$fullIPAddress/Items/$id/Images/Thumb";
+    disc = "$fullIPAddress/Items/$id/Images/Disc";
+    box = "$fullIPAddress/Items/$id/Images/Box";
+    screenshot = "$fullIPAddress/Items/$id/Images/Screenshot";
+    menu = "$fullIPAddress/Items/$id/Images/Menu";
+    chapter = "$fullIPAddress/Items/$id/Images/Chapter";
+    boxRear = "$fullIPAddress/Items/$id/Images/BoxRear";
+    profile = "$fullIPAddress/Items/$id/Images/Profile";
+  }
 }
 
 enum ItemTypes {
@@ -102,16 +104,12 @@ class BaseModel {
         (t) => t.name.toString().toLowerCase() == type_.toLowerCase());
   }
 
-  Widget _buildSeries() {
-    return Container();
-  }
-
   Widget build(WidgetRef ref) {
-    print("Type: $type");
     if (type == ItemTypes.movie) {
       return movieBuilder(this, ref);
     } else if (type == ItemTypes.series) {
-      return seasonBuilder(this, ref);
+      // return SeasonBuilder().build() async
+      return SeriesBuilder(this, ref).seriesDetailBuilder();
     } else {
       return Center(
           child: Text("Media type '${type.name}' not implemented yet!"));

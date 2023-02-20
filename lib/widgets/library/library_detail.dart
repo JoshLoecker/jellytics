@@ -31,7 +31,7 @@ class LibraryDetailState extends ConsumerState<LibraryDetail>
     initClient(ref);
   }
 
-  Future<Widget> buildListItems() async {
+  Future<Widget> detailItems() async {
     // final serverDetails = ref.watch(server.serverDetailsProvider);
     Map<String, dynamic> libraryItemsJSON =
         await ref.read(clientDetailsProvider.notifier).dio.get(
@@ -55,10 +55,8 @@ class LibraryDetailState extends ConsumerState<LibraryDetail>
       String type = currentItem["Type"];
       String path = currentItem["Path"];
       ImagePaths imagePaths = ImagePaths(
-        primary:
-            "${ref.read(serverDetailsProvider.notifier).fullAddress}/Items/$id/Images/Primary",
-        backdrop:
-            "${ref.read(serverDetailsProvider.notifier).fullAddress}/Items/$id/Images/Backdrop",
+        ref.read(serverDetailsProvider.notifier).fullAddress,
+        id,
       );
       BaseModel model = BaseModel(
         name: name,
@@ -84,7 +82,7 @@ class LibraryDetailState extends ConsumerState<LibraryDetail>
                   context,
                   CupertinoPageRoute(
                     builder: (context) => ItemDetail(
-                      item: libraryItems[index],
+                      model: libraryItems[index],
                     ),
                   ),
                 );
@@ -140,10 +138,10 @@ class LibraryDetailState extends ConsumerState<LibraryDetail>
     );
   }
 
-  Widget buildLibraryList() {
+  Widget buildLibraryDetails() {
     return FutureBuilder(
       // future: getLibraryItems(),
-      future: buildListItems(),
+      future: detailItems(),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
@@ -174,7 +172,7 @@ class LibraryDetailState extends ConsumerState<LibraryDetail>
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(middle: Text(widget.libraryName)),
       child: SafeArea(
-        child: buildLibraryList(),
+        child: buildLibraryDetails(),
       ),
     );
   }
