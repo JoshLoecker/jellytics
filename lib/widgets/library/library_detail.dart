@@ -3,11 +3,12 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jellytics/models/cardWidget.dart';
+import 'package:jellytics/models/card_widget.dart';
 import 'package:jellytics/models/base.dart';
-import 'package:jellytics/providers/serverDetails.dart';
+import 'package:jellytics/providers/server_details.dart';
 import 'package:jellytics/client/client.dart';
 import 'package:jellytics/widgets/library/item_detail.dart';
+import 'package:jellytics/utils/storage.dart' as storage;
 
 class LibraryDetail extends ConsumerStatefulWidget {
   const LibraryDetail(
@@ -32,7 +33,6 @@ class LibraryDetailState extends ConsumerState<LibraryDetail>
 
   Future<Widget> buildListItems() async {
     // final serverDetails = ref.watch(server.serverDetailsProvider);
-
     Map<String, dynamic> libraryItemsJSON =
         await ref.read(clientDetailsProvider.notifier).dio.get(
       "/Items",
@@ -66,7 +66,7 @@ class LibraryDetailState extends ConsumerState<LibraryDetail>
         parentId: widget.libraryId,
         year: year,
         path: path,
-        type: type,
+        type_: type,
         overview: overview,
         imagePaths: imagePaths,
       );
@@ -153,7 +153,14 @@ class LibraryDetailState extends ConsumerState<LibraryDetail>
             return const Center(child: CupertinoActivityIndicator());
           case ConnectionState.done:
             if (snapshot.hasError) {
-              return Text("Error: ${snapshot.error}");
+              String error = "";
+              // Perform error handling
+              if (snapshot.error.toString().contains("No element")) {
+                error = "No items found";
+              } else {
+                error = snapshot.error.toString();
+              }
+              return Center(child: Text(error));
             } else {
               return snapshot.data;
             }

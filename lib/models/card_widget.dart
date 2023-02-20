@@ -1,8 +1,7 @@
-/*
-This file is responsible for defining the default "card" that will show:
-- libraries (such as Movies, TV, etc.)
-- Specific library items (such as a movie, a TV show, etc.)
-*/
+/// This file is responsible for defining the default "card" that will show:
+/// - libraries (such as Movies, TV, etc.)
+/// - Specific library items (such as a movie, a TV show, etc.)
+
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:jellytics/utils/interface.dart' as ui;

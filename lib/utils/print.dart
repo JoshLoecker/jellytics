@@ -1,6 +1,5 @@
-/*
-Create a function to print a string as a json object
- */
+/// Create a function to print a string as a json object
+
 import 'dart:convert';
 
 void printAsJson(Map json) {

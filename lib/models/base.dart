@@ -1,5 +1,11 @@
-import 'package:flutter/cupertino.dart';
+/// This file contains the base model for all media types
+/// Calling the 'build' method will return a widget based on the type of media
+
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jellytics/models/movie.dart';
+import 'package:jellytics/models/series.dart';
 
 class ImagePaths {
   late String primary;
@@ -33,12 +39,52 @@ class ImagePaths {
   });
 }
 
+enum ItemTypes {
+  aggregateFolder,
+  audio,
+  audioBook,
+  basePluginFolder,
+  book,
+  boxSet,
+  channel,
+  channelFolderItem,
+  collectionFolder,
+  episode,
+  folder,
+  genre,
+  manualPlaylistsFolder,
+  movie,
+  liveTvChannel,
+  liveTvProgram,
+  musicAlbum,
+  musicArtist,
+  musicGenre,
+  musicVideo,
+  person,
+  photo,
+  photoAlbum,
+  playlist,
+  playlistsFolder,
+  program,
+  recording,
+  season,
+  series,
+  studio,
+  trailer,
+  tvChannel,
+  tvProgram,
+  userRootFolder,
+  userView,
+  video,
+  year,
+}
+
 class BaseModel {
   String name;
   String id;
   String parentId;
   String year;
-  String type;
+  late ItemTypes type;
   String path;
   String overview;
   ImagePaths imagePaths;
@@ -49,9 +95,28 @@ class BaseModel {
       required this.parentId,
       required this.year,
       required this.path,
-      required this.type,
+      required String type_,
       required this.overview,
-      required this.imagePaths});
+      required this.imagePaths}) {
+    type = ItemTypes.values.firstWhere(
+        (t) => t.name.toString().toLowerCase() == type_.toLowerCase());
+  }
+
+  Widget _buildSeries() {
+    return Container();
+  }
+
+  Widget build(WidgetRef ref) {
+    print("Type: $type");
+    if (type == ItemTypes.movie) {
+      return movieBuilder(this, ref);
+    } else if (type == ItemTypes.series) {
+      return seasonBuilder(this, ref);
+    } else {
+      return Center(
+          child: Text("Media type '${type.name}' not implemented yet!"));
+    }
+  }
 }
 
 Row rowItem(String title, String value) {

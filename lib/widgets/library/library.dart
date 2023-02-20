@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jellytics/models/cardWidget.dart';
+import 'package:jellytics/models/card_widget.dart';
 import 'package:jellytics/client/client.dart';
 import 'package:jellytics/utils/storage.dart' as storage;
-import 'package:jellytics/providers/serverDetails.dart';
+import 'package:jellytics/providers/server_details.dart';
 import 'package:jellytics/utils/interface.dart';
 import 'package:jellytics/widgets/library/library_detail.dart';
 
@@ -52,6 +52,25 @@ class LibraryState extends ConsumerState<Library> with clientFromStorage {
       "userId": ref.read(serverDetailsProvider.notifier).userId,
     }).then((value) => value.data);
 
+    // Make a cupertino button with a child of a network image
+    // TODO: test this
+    Widget push = CupertinoButton(
+      child: Image.network(
+        "${ref.read(serverDetailsProvider.notifier).fullAddress}/Items/${libraryJSON['Items'][0]['Id']}/Images/Primary",
+      ),
+      onPressed: () {
+        Navigator.push(
+          context,
+          CupertinoPageRoute(
+            builder: (context) => LibraryDetail(
+              libraryName: libraryJSON["Items"][0]["Name"],
+              libraryId: libraryJSON["Items"][0]["Id"],
+            ),
+          ),
+        );
+      },
+    );
+
     return ListView.builder(
         itemCount: libraryJSON["TotalRecordCount"],
         scrollDirection: Axis.vertical,
@@ -91,7 +110,7 @@ class LibraryState extends ConsumerState<Library> with clientFromStorage {
     ref.watch(serverDetailsProvider.notifier);
     ref.watch(clientDetailsProvider.notifier);
 
-    if (!ref.read(clientDetailsProvider.notifier).isLoggedIn) {
+    if (!ref.watch(clientDetailsProvider.notifier).isLoggedIn) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -133,24 +152,27 @@ class LibraryState extends ConsumerState<Library> with clientFromStorage {
             case ConnectionState.active:
               return Column(children: <Widget>[
                 const Center(child: CupertinoActivityIndicator()),
-                CupertinoButton(
-                  onPressed: () async {
-                    if (kDebugMode) {
-                      print("");
-                      print(
-                          "Headers: ${ref.read(clientDetailsProvider.notifier).dio.options.headers}");
-                      print("Username: ${await storage.getUsername()}");
-                      print("UserID: ${await storage.getUserId()}");
-                      print("Protocol: ${await storage.getProtocol()}");
-                      print("IP: ${await storage.getIP()}");
-                      print("Port: ${await storage.getPort()}");
-                      print(
-                          "Final Server Address: ${await storage.getFinalServerAddress()}");
-                      print("Access Token: ${await storage.getAccessToken()}");
-                      print("");
-                    }
-                  },
-                  child: const Text("Print SecureStorage"),
+                Center(
+                  child: CupertinoButton(
+                    onPressed: () async {
+                      if (kDebugMode) {
+                        print("");
+                        print(
+                            "Headers: ${ref.read(clientDetailsProvider.notifier).dio.options.headers}");
+                        print("Username: ${await storage.getUsername()}");
+                        print("UserID: ${await storage.getUserId()}");
+                        print("Protocol: ${await storage.getProtocol()}");
+                        print("IP: ${await storage.getIP()}");
+                        print("Port: ${await storage.getPort()}");
+                        print(
+                            "Final Server Address: ${await storage.getFinalServerAddress()}");
+                        print(
+                            "Access Token: ${await storage.getAccessToken()}");
+                        print("");
+                      }
+                    },
+                    child: const Text("Print SecureStorage"),
+                  ),
                 ),
               ]);
             case ConnectionState.done:

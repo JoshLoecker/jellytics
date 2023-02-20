@@ -1,11 +1,12 @@
+/// Movie model
+/// This is used to show movie details
+
 import 'dart:ui';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellytics/models/base.dart';
 
 Widget movieBuilder(BaseModel model, WidgetRef ref) {
-  // Return a scrollable widget
   return ListView(
     // Add padding to the bottom to allow for the bottom navigation bar
     padding: const EdgeInsets.fromLTRB(0, 0, 0, 120),
@@ -50,54 +51,6 @@ Widget movieBuilder(BaseModel model, WidgetRef ref) {
         rowItem("RELEASE YEAR", model.year),
         rowItem("FILENAME", model.path.split("/").last),
         rowItem("PATH", model.path),
-      ],
-    ),
-  );
-}
-
-Widget oldMovieBuilder(BaseModel model, WidgetRef ref) {
-  return CupertinoScrollbar(
-    child: Column(
-      children: <Widget>[
-        // Item Details
-        Expanded(
-          child: Row(
-            children: <Widget>[
-              SizedBox(
-                width: MediaQueryData.fromWindow(WidgetsBinding.instance.window)
-                        .size
-                        .height /
-                    10,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: const <Widget>[
-                  Text("Title", style: TextStyle(color: Colors.grey)),
-                  Text("Release Year", style: TextStyle(color: Colors.grey)),
-                  Text("Filename", style: TextStyle(color: Colors.grey)),
-                  Text("Path", style: TextStyle(color: Colors.grey)),
-                ],
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  children: <Widget>[
-                    Text(model.name),
-                    Text(model.year),
-                    Text(model.path.split("/").last),
-                    Text(model.path),
-                  ],
-                ),
-              ),
-              SizedBox(
-                width: MediaQueryData.fromWindow(WidgetsBinding.instance.window)
-                        .size
-                        .width /
-                    10,
-              ),
-            ],
-          ),
-        ),
       ],
     ),
   );

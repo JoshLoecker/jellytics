@@ -1,3 +1,5 @@
+/// This file contains the [ServerDetails] class, which is a [StateNotifierProvider]
+
 // Freezed
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -8,8 +10,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 // Additional imports
 import 'package:jellytics/utils/storage.dart' as storage;
 
-part 'serverDetails.freezed.dart';
-part 'serverDetails.g.dart';
+part 'server_details.freezed.dart';
+part 'server_details.g.dart';
 
 @freezed
 class ServerData with _$ServerData {

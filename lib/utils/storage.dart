@@ -1,3 +1,8 @@
+/// This file contains all the functions to store and retrieve data from the
+/// secure storage. The secure storage is used to store the user's credentials
+/// and other sensitive data. The data is stored in the secure storage using
+/// the [FlutterSecureStorage] package
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 

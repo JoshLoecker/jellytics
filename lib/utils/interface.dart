@@ -1,3 +1,7 @@
+/// This file contains functions and widgets that are used in multiple places
+/// throughout the app. This is to avoid code duplication and to keep the code
+/// clean and easy to read.
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';

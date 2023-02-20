@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellytics/client/client.dart';
-import 'package:jellytics/providers/serverDetails.dart';
+import 'package:jellytics/providers/server_details.dart';
 import 'package:jellytics/utils/storage.dart' as storage;
 import 'package:jellytics/utils/interface.dart';
 

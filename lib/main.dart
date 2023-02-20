@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellytics/client/client.dart';
-import 'package:jellytics/providers/serverDetails.dart';
+import 'package:jellytics/providers/server_details.dart';
 import 'package:jellytics/widgets/settings/settings.dart';
 import 'package:jellytics/widgets/library/library.dart';
 

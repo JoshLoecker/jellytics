@@ -1,8 +1,11 @@
+/// This class is used to store the client details, such as the access token, user ID, etc.
+/// It also contains the clientFromStorage() function, which is used to get the client details from storage.
+
 // Freezed
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:jellytics/providers/serverDetails.dart';
+import 'package:jellytics/providers/server_details.dart';
 
 // Riverpod
 import 'package:riverpod_annotation/riverpod_annotation.dart';
