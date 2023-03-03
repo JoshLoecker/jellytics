@@ -2,6 +2,7 @@
 /// This is used to show movie details
 
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellytics/models/base.dart';
@@ -29,9 +30,15 @@ Widget movieBuilder(BaseModel model, WidgetRef ref) {
               ).createShader(rect);
             },
             blendMode: BlendMode.dstOut,
-            child: Image.network(
-              model.imagePaths.backdrop,
+            child: CachedNetworkImage(
+              imageUrl: model.imagePaths.backdrop,
               fit: BoxFit.cover,
+              placeholder: (context, url) => Container(color: Colors.black),
+              placeholderFadeInDuration: const Duration(milliseconds: 0),
+              fadeOutDuration: const Duration(milliseconds: 0),
+              fadeOutCurve: Curves.linear,
+              fadeInCurve: Curves.linear,
+              fadeInDuration: const Duration(milliseconds: 0),
             ),
           ),
         ),

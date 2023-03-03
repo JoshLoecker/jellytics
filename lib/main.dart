@@ -3,21 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:jellytics/client/client.dart';
 import 'package:jellytics/providers/server_details.dart';
 import 'package:jellytics/widgets/settings/settings.dart';
 import 'package:jellytics/widgets/library/library.dart';
+import 'package:jellytics/utils/storage.dart' as storage;
 
-class App extends StatelessWidget {
-  const App({super.key});
+class Jellytics extends StatelessWidget {
+  const Jellytics({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const CupertinoApp(
-      title: "Jellytics",
-      theme: CupertinoThemeData(brightness: Brightness.dark),
-      debugShowCheckedModeBanner: false,
-      home: HomePage(),
+    return Consumer(
+      builder: (context, ref, child) {
+        return const CupertinoApp(
+          theme: CupertinoThemeData(brightness: Brightness.dark),
+          debugShowCheckedModeBanner: false,
+          home: CupertinoPageScaffold(
+            navigationBar: CupertinoNavigationBar(
+              middle: Text(
+                'Jellytics',
+              ),
+            ),
+            child: HomePage(),
+          ),
+        );
+      },
     );
   }
 }
@@ -30,14 +42,14 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _StatefulApp extends ConsumerState<HomePage> {
-  final String _appBarTitle = "Jellytics";
-
   @override
   void initState() {
     super.initState();
     if (!kIsWeb) FlutterNativeSplash.remove();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       ref.watch(clientDetailsProvider.notifier).clientFromStorage();
+      ref.watch(clientDetailsProvider.notifier).dio.options.baseUrl =
+          await storage.getFinalServerAddress();
     });
   }
 
@@ -56,7 +68,6 @@ class _StatefulApp extends ConsumerState<HomePage> {
     ref.watch(clientDetailsProvider.notifier);
     ref.watch(serverDetailsProvider.notifier);
 
-    // set the server details from storage
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
         items: const <BottomNavigationBarItem>[
@@ -79,17 +90,10 @@ class _StatefulApp extends ConsumerState<HomePage> {
         ],
       ),
       tabBuilder: (BuildContext context, int index) {
-        return CupertinoTabView(
-          builder: (BuildContext context) {
-            return CupertinoPageScaffold(
-              navigationBar: CupertinoNavigationBar(
-                middle: Text(_appBarTitle),
-              ),
-              child: Center(
-                child: _screenWidgets.elementAt(index),
-              ),
-            );
-          },
+        return CupertinoPageScaffold(
+          child: Center(
+            child: _screenWidgets.elementAt(index),
+          ),
         );
       },
     );
@@ -100,9 +104,10 @@ void main() {
   // Keep splash screen until I say it is cleared
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   if (!kIsWeb) FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
   runApp(
     const ProviderScope(
-      child: App(),
+      child: Jellytics(),
     ),
   );
 }

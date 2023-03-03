@@ -184,10 +184,21 @@ class SettingsState extends ConsumerState<Settings> with clientFromStorage {
           // If logged in, make the background have a light-green color
           // Add padding on the color around the text
           loggedInStatusWidget(
-              isLoggedIn: ref.watch(clientDetailsProvider.notifier).isLoggedIn,
-              username: ref.watch(serverDetailsProvider.notifier).username),
+            isLoggedIn: ref.watch(
+              clientDetailsProvider.notifier.select(
+                (value) => value.isLoggedIn,
+              ),
+            ),
+            username: ref.watch(
+              serverDetailsProvider.notifier.select(
+                (value) => value.username,
+              ),
+            ),
+          ),
           // Drop-down widget with options "http://" and "https://"
-          if (!ref.watch(clientDetailsProvider.notifier).isLoggedIn)
+          if (!ref.watch(clientDetailsProvider.notifier.select(
+            (value) => value.isLoggedIn,
+          )))
             Row(
               children: <Widget>[
                 CupertinoButton(
@@ -235,15 +246,20 @@ class SettingsState extends ConsumerState<Settings> with clientFromStorage {
                 ),
               ],
             ),
-          if (!ref.watch(clientDetailsProvider.notifier).isLoggedIn)
+          if (!ref.watch(clientDetailsProvider.notifier
+              .select((value) => value.isLoggedIn)))
             Flexible(child: usernameTextField()),
-          if (!ref.watch(clientDetailsProvider.notifier).isLoggedIn)
+          if (!ref.watch(clientDetailsProvider.notifier
+              .select((value) => value.isLoggedIn)))
             Flexible(child: passwordTextField()),
-          if (!ref.watch(clientDetailsProvider.notifier).isLoggedIn)
+          if (!ref.watch(clientDetailsProvider.notifier
+              .select((value) => value.isLoggedIn)))
             Container(margin: const EdgeInsets.only(top: 20)),
-          if (!ref.watch(clientDetailsProvider.notifier).isLoggedIn)
+          if (!ref.watch(clientDetailsProvider.notifier
+              .select((value) => value.isLoggedIn)))
             loginButton(),
-          if (!ref.watch(clientDetailsProvider.notifier).isLoggedIn)
+          if (!ref.watch(clientDetailsProvider.notifier
+              .select((value) => value.isLoggedIn)))
             Container(margin: const EdgeInsets.only(top: 20)),
           SizedBox(
             width: 185,
@@ -272,7 +288,7 @@ class SettingsState extends ConsumerState<Settings> with clientFromStorage {
                 if (kDebugMode) {
                   print("");
                   print(
-                      "Headers: ${ref.read(clientDetailsProvider.notifier).dio.options.headers}");
+                      "Headers: ${ref.read(clientDetailsProvider.notifier.select((value) => value.dio.options.headers))}");
                   print("Username: ${await storage.getUsername()}");
                   print("UserID: ${await storage.getUserId()}");
                   print("Protocol: ${await storage.getProtocol()}");
@@ -282,7 +298,7 @@ class SettingsState extends ConsumerState<Settings> with clientFromStorage {
                       "Final Server Address: ${await storage.getFinalServerAddress()}");
                   print("Access Token: ${await storage.getAccessToken()}");
                   print(
-                      "isLoggedIn: ${ref.read(clientDetailsProvider.notifier).isLoggedIn}");
+                      "isLoggedIn: ${ref.read(clientDetailsProvider.notifier.select((value) => value.isLoggedIn))}");
                   print("");
                 }
               },

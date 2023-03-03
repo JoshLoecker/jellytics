@@ -34,7 +34,6 @@ class ItemDetailState extends ConsumerState<ItemDetail> with clientFromStorage {
           child: Text(
               "Media type '${widget.model.type.name}' not implemented yet"));
     }
-    return Container();
   }
 
   @override
@@ -46,7 +45,6 @@ class ItemDetailState extends ConsumerState<ItemDetail> with clientFromStorage {
             largeTitle: Text("Media Details"),
           ),
           SliverFillRemaining(
-            // child: widget.item.build(ref),
             child: buildDetails(),
           ),
         ],

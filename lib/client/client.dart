@@ -91,6 +91,9 @@ class ClientDetails extends _$ClientDetails {
 
       Dio newDio = state.dio;
       newDio.options.headers["x-emby-authorization"] += ", Token=$accessToken";
+      newDio.options.baseUrl =
+          ref.read(serverDetailsProvider.notifier).fullAddress;
+
       state = state.copyWith(
         dio: newDio,
         isLoggedIn: true,
@@ -152,8 +155,8 @@ class ClientDetails extends _$ClientDetails {
 
 mixin clientFromStorage {
   void initClient(WidgetRef ref) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.watch(clientDetailsProvider.notifier).clientFromStorage();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.watch(clientDetailsProvider.notifier).clientFromStorage();
     });
   }
 }

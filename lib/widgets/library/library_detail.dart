@@ -1,5 +1,5 @@
 import 'dart:ui';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,12 +8,13 @@ import 'package:jellytics/models/base.dart';
 import 'package:jellytics/providers/server_details.dart';
 import 'package:jellytics/client/client.dart';
 import 'package:jellytics/widgets/library/item_detail.dart';
-import 'package:jellytics/utils/storage.dart' as storage;
 
 class LibraryDetail extends ConsumerStatefulWidget {
-  const LibraryDetail(
-      {required this.libraryName, required this.libraryId, Key? key})
-      : super(key: key);
+  const LibraryDetail({
+    required this.libraryName,
+    required this.libraryId,
+    Key? key,
+  }) : super(key: key);
 
   // Define libraryName
   final String libraryName;
@@ -31,10 +32,8 @@ class LibraryDetailState extends ConsumerState<LibraryDetail>
     initClient(ref);
   }
 
-  Future<Widget> detailItems() async {
-    // final serverDetails = ref.watch(server.serverDetailsProvider);
-    Map<String, dynamic> libraryItemsJSON =
-        await ref.read(clientDetailsProvider.notifier).dio.get(
+  Future<Map<String, dynamic>> getLibraryJSON() async {
+    return await ref.read(clientDetailsProvider.notifier).dio.get(
       "/Items",
       queryParameters: {
         "userId": ref.read(serverDetailsProvider.notifier).userId,
@@ -44,31 +43,23 @@ class LibraryDetailState extends ConsumerState<LibraryDetail>
         "fields": "Overview,Type,Path",
       },
     ).then((value) => value.data);
+  }
 
+  Future<Widget> detailItems() async {
+    Map<String, dynamic> libraryItemsJSON = await getLibraryJSON();
     List<BaseModel> libraryItems = [];
     for (var i = 0; i < libraryItemsJSON["TotalRecordCount"]; i++) {
       Map<String, dynamic> currentItem = libraryItemsJSON["Items"][i];
-      String name = currentItem["Name"];
-      String id = currentItem["Id"];
-      String year = currentItem["ProductionYear"].toString();
-      String overview = currentItem["Overview"] ?? "";
-      String type = currentItem["Type"];
-      String path = currentItem["Path"];
-      ImagePaths imagePaths = ImagePaths(
-        ref.read(serverDetailsProvider.notifier).fullAddress,
-        id,
-      );
-      BaseModel model = BaseModel(
-        name: name,
-        id: id,
+      libraryItems.add(BaseModel(
+        name: currentItem["Name"],
+        id: currentItem["Id"],
         parentId: widget.libraryId,
-        year: year,
-        path: path,
-        type_: type,
-        overview: overview,
-        imagePaths: imagePaths,
-      );
-      libraryItems.add(model);
+        year: currentItem["ProductionYear"].toString(),
+        path: currentItem["Path"],
+        type_: currentItem["Type"],
+        overview: currentItem["Overview"] ?? "",
+        ref: ref,
+      ));
     }
 
     return ListView.builder(
@@ -88,15 +79,23 @@ class LibraryDetailState extends ConsumerState<LibraryDetail>
                 );
               },
               child: Stack(
-                // fit: StackFit.passthrough,
                 fit: StackFit.expand,
                 children: [
                   // Set the image
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
-                    child: Image.network(
-                      libraryItems[index].imagePaths.backdrop,
+                    child: CachedNetworkImage(
+                      imageUrl: libraryItems[index].imagePaths.backdrop,
                       fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        color: Colors.black,
+                      ),
+                      placeholderFadeInDuration:
+                          const Duration(milliseconds: 0),
+                      fadeOutDuration: const Duration(milliseconds: 0),
+                      fadeOutCurve: Curves.linear,
+                      fadeInCurve: Curves.linear,
+                      fadeInDuration: const Duration(milliseconds: 0),
                     ),
                   ),
                   BackdropFilter(
@@ -111,20 +110,44 @@ class LibraryDetailState extends ConsumerState<LibraryDetail>
                         margin: const EdgeInsets.fromLTRB(10, 10, 0, 10),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            libraryItems[index].imagePaths.primary,
+                          child: CachedNetworkImage(
+                            imageUrl: libraryItems[index].imagePaths.primary,
                             fit: BoxFit.cover,
+                            // Make the placeholder a black box
+                            placeholder: (context, url) => Container(
+                              color: Colors.black,
+                            ),
+                            placeholderFadeInDuration:
+                                const Duration(milliseconds: 0),
+                            fadeOutCurve: Curves.linear,
+                            fadeOutDuration: const Duration(milliseconds: 0),
+                            fadeInCurve: Curves.linear,
+                            fadeInDuration: const Duration(milliseconds: 0),
                           ),
                         ),
                       ),
+                      const SizedBox(width: 10),
                       Container(
                         padding: const EdgeInsets.all(10),
-                        child: Text(
-                          libraryItems[index].name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              libraryItems[index].name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
+                            ),
+                            Text(
+                              libraryItems[index].year,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[400],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -138,31 +161,34 @@ class LibraryDetailState extends ConsumerState<LibraryDetail>
     );
   }
 
-  Widget buildLibraryDetails() {
-    return FutureBuilder(
-      // future: getLibraryItems(),
-      future: detailItems(),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-            return const Text("No connection");
-          case ConnectionState.waiting:
-          case ConnectionState.active:
-            return const Center(child: CupertinoActivityIndicator());
-          case ConnectionState.done:
-            if (snapshot.hasError) {
-              String error = "";
-              // Perform error handling
-              if (snapshot.error.toString().contains("No element")) {
-                error = "No items found";
-              } else {
-                error = snapshot.error.toString();
-              }
-              return Center(child: Text(error));
-            } else {
-              return snapshot.data;
-            }
-        }
+  void showSortOptions() {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoActionSheet(
+          title: const Text("Sort by"),
+          actions: <Widget>[
+            // Show a multi select menu with sort options
+            CupertinoActionSheetAction(
+              child: const Text("Name (A → Z)"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            CupertinoActionSheetAction(
+              child: const Text("Year (Oldest → Newest)"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            child: const Text("Cancel"),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        );
       },
     );
   }
@@ -170,9 +196,45 @@ class LibraryDetailState extends ConsumerState<LibraryDetail>
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text(widget.libraryName)),
+      navigationBar: CupertinoNavigationBar(
+        middle: Text(widget.libraryName),
+        trailing: CupertinoButton(
+          padding: const EdgeInsets.all(0),
+          child: const Icon(CupertinoIcons.sort_down, size: 30),
+          onPressed: () {
+            showSortOptions();
+          },
+        ),
+      ),
       child: SafeArea(
-        child: buildLibraryDetails(),
+        child: CupertinoPageScaffold(
+          child: FutureBuilder(
+            // future: getLibraryItems(),
+            future: detailItems(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.none:
+                  return const Text("No connection");
+                case ConnectionState.waiting:
+                case ConnectionState.active:
+                  return const Center(child: CupertinoActivityIndicator());
+                case ConnectionState.done:
+                  if (snapshot.hasError) {
+                    String error = "";
+                    // Perform error handling
+                    if (snapshot.error.toString().contains("No element")) {
+                      error = "No items found";
+                    } else {
+                      error = snapshot.error.toString();
+                    }
+                    return Center(child: Text(error));
+                  } else {
+                    return snapshot.data;
+                  }
+              }
+            },
+          ),
+        ),
       ),
     );
   }

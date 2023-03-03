@@ -8,7 +8,7 @@ import 'package:jellytics/utils/interface.dart' as ui;
 
 Widget cardContainer(
   Widget child, {
-  double maxCardHeight = 200,
+  double maxCardHeight = 125,
   EdgeInsets margin = const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
 }) {
   return SafeArea(

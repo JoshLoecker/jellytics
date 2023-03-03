@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellytics/models/types/movie.dart';
 import 'package:jellytics/models/types/series.dart';
+import 'package:jellytics/providers/server_details.dart';
 
 class ImagePaths {
   late String primary;
@@ -89,17 +90,23 @@ class BaseModel {
   late ItemTypes type;
   String path;
   String overview;
-  ImagePaths imagePaths;
+  late ImagePaths imagePaths;
+  WidgetRef ref;
 
-  BaseModel(
-      {required this.name,
-      required this.id,
-      required this.parentId,
-      required this.year,
-      required this.path,
-      required String type_,
-      required this.overview,
-      required this.imagePaths}) {
+  BaseModel({
+    required this.name,
+    required this.id,
+    required this.parentId,
+    required this.year,
+    required this.path,
+    required String type_,
+    required this.overview,
+    required this.ref,
+  }) {
+    imagePaths = ImagePaths(
+        ref.watch(serverDetailsProvider.notifier
+            .select((value) => value.fullAddress)),
+        id);
     type = ItemTypes.values.firstWhere(
         (t) => t.name.toString().toLowerCase() == type_.toLowerCase());
   }
@@ -108,7 +115,6 @@ class BaseModel {
     if (type == ItemTypes.movie) {
       return movieBuilder(this, ref);
     } else if (type == ItemTypes.series) {
-      // return SeasonBuilder().build() async
       return SeriesBuilder(this, ref).seriesDetailBuilder();
     } else {
       return Center(

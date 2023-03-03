@@ -3,7 +3,7 @@
 /// This includes the season details (Season 01, 02, etc), along with the episode details (episode 01, 02, etc)
 
 import 'dart:ui';
-import 'package:dio/dio.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,9 +25,9 @@ class SeasonModel extends BaseModel {
     required String path,
     required String type_,
     required String overview,
-    required ImagePaths imagePaths,
     required this.seriesName,
     required this.seriesId,
+    required WidgetRef ref,
   }) : super(
           name: name,
           id: id,
@@ -36,7 +36,7 @@ class SeasonModel extends BaseModel {
           path: path,
           type_: type_,
           overview: overview,
-          imagePaths: imagePaths,
+          ref: ref,
         );
 }
 
@@ -70,12 +70,9 @@ class SeriesBuilder {
             path: item["Path"],
             type_: item["Type"],
             overview: "",
-            imagePaths: ImagePaths(
-              ref.read(serverDetailsProvider.notifier).fullAddress,
-              item["Id"],
-            ),
             seriesName: item["SeriesName"],
             seriesId: item["SeriesId"],
+            ref: ref,
           ),
         );
       }
@@ -115,9 +112,17 @@ class SeriesBuilder {
                   snapshot.data!.map<Widget>(
                     (item) => CupertinoListTile(
                       title: Text(item.name),
-                      leading: Image.network(
-                        item.imagePaths.primary,
+                      leading: CachedNetworkImage(
+                        imageUrl: item.imagePaths.primary,
                         fit: BoxFit.cover,
+                        placeholder: (context, url) =>
+                            Container(color: Colors.black),
+                        placeholderFadeInDuration:
+                            const Duration(milliseconds: 0),
+                        fadeOutDuration: const Duration(milliseconds: 0),
+                        fadeOutCurve: Curves.linear,
+                        fadeInCurve: Curves.linear,
+                        fadeInDuration: const Duration(milliseconds: 0),
                       ),
                       trailing: const Icon(Icons.arrow_forward_ios),
                       additionalInfo: Text(item.year),
