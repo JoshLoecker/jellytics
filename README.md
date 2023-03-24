@@ -1,4 +1,6 @@
-# jellytics
+# Jellytics
+
+<img src="https://cdn-icons-png.flaticon.com/512/9488/9488351.png" alt="Jellytics Icon" style="width:100px; height:100px; float:left; margin-right:10px;" />
 
 A [Jellyfin](https://jellyfin.org/) monitoring tool
 
@@ -15,4 +17,4 @@ More stability (and valid releases) will come later.
 
 
 # App Icon Attribution
-[App icon provided by Marz Gallery (Flaticon)](https://www.flaticon.com/free-icons/sealife)
+[App icon provided by Marz Gallery (Flaticon)](https://www.flaticon.com/authors/marz-gallery)
